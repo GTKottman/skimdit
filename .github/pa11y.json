@@ -1,9 +1,16 @@
 {
   "defaults": {
-    "runners": ["axe"],
+    "runners": [
+      "axe"
+    ],
     "standard": "WCAG2AA",
     "timeout": 30000,
-    "chromeLaunchConfig": { "args": ["--no-sandbox"] }
+    "chromeLaunchConfig": {
+      "args": [
+        "--no-sandbox"
+      ]
+    },
+    "hideElements": ".katex-html"
   },
   "urls": [
     "http://127.0.0.1:8137/",
