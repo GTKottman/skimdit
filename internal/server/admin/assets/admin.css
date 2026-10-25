@@ -87,6 +87,17 @@ input[type=checkbox] { width: 18px; height: 18px; accent-color: var(--accent); m
 .search input { min-width: 240px; }
 .qr { display: block; background: #fff; padding: var(--s-2); margin: var(--s-4) 0; }
 
+/* Figures and bar tables. */
+.figures { display: flex; flex-wrap: wrap; gap: var(--s-6); margin: var(--s-5) 0 0; }
+.figures dt { color: var(--ink-6); font-size: 13px; }
+.figures dd { margin: 0; font-size: 28px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.bars td { padding-block: var(--s-2); }
+.bar-label { width: 40%; max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bar-cell { width: 60%; }
+.bar { display: block; height: 10px; min-width: 1px; background: var(--accent); }
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-6); }
+@media (max-width: 900px) { .two-col { grid-template-columns: 1fr; } }
+
 /* Moderation queue. */
 .filter { display: flex; gap: var(--s-4); }
 .filter a { color: var(--ink-6); text-decoration: none; min-height: 40px; display: inline-flex; align-items: center; gap: var(--s-1); }

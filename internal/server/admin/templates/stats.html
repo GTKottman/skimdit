@@ -1,0 +1,22 @@
+{{define "content"}}
+<div class="head-row">
+  <h1>Stats</h1>
+  <nav class="filter" aria-label="Range">
+    <a href="{{.Base}}stats?range=7"{{if eq (index .Data "Days") 7}} aria-current="page"{{end}}>7 days</a>
+    <a href="{{.Base}}stats"{{if eq (index .Data "Days") 30}} aria-current="page"{{end}}>30 days</a>
+  </nav>
+</div>
+{{if not (index .Data "Enabled")}}<p class="flash">Stats are off (<code>[stats] enabled = false</code>).</p>{{end}}
+<p class="muted">Counted on the server: no cookies, no scripts, nothing that identifies a reader. Bots are left out; feed readers are counted separately.</p>
+<dl class="figures">
+  <div><dt>Page views</dt><dd>{{index .Data "Total"}}</dd></div>
+  <div><dt>Feed fetches</dt><dd>{{index .Data "Feeds"}}</dd></div>
+</dl>
+<h2 class="section">Page views per day</h2>
+<table class="rows bars"><tbody>{{range index .Data "Daily"}}<tr><td class="bar-label">{{.Label}}</td><td class="bar-cell"><span class="bar" style="width: {{.Pct}}%"></span></td><td class="num">{{.N}}</td></tr>{{end}}</tbody></table>
+<div class="two-col">
+  <section><h2 class="section">Top pages</h2>
+  {{with index .Data "Pages"}}<table class="rows bars"><tbody>{{range .}}<tr><td class="bar-label"><a href="{{.Label}}" target="_blank" rel="noopener">{{.Label}}</a></td><td class="bar-cell"><span class="bar" style="width: {{.Pct}}%"></span></td><td class="num">{{.N}}</td></tr>{{end}}</tbody></table>{{else}}<p class="empty">No views yet.</p>{{end}}</section>
+  <section><h2 class="section">Where readers came from</h2>
+  {{with index .Data "Referrers"}}<table class="rows bars"><tbody>{{range .}}<tr><td class="bar-label">{{.Label}}</td><td class="bar-cell"><span class="bar" style="width: {{.Pct}}%"></span></td><td class="num">{{.N}}</td></tr>{{end}}</tbody></table>{{else}}<p class="empty">No other sites have sent readers yet.</p>{{end}}</section>
+</div>{{end}}

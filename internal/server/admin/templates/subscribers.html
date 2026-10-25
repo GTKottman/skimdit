@@ -1,0 +1,26 @@
+{{define "content"}}{{$c := index .Data "Counts"}}{{$titles := index .Data "Titles"}}
+<div class="head-row">
+  <h1>Subscribers</h1>
+  <a class="button secondary" href="{{.Base}}subscribers.csv">Export CSV</a>
+  <form method="post" action="{{.Base}}subscribers/action" class="inline"><input type="hidden" name="csrf" value="{{.CSRF}}"><input type="hidden" name="action" value="test"><button class="secondary" type="submit">Email me the newest post</button></form>
+</div>
+{{if not (index .Data "Enabled")}}<p class="flash">The newsletter is off. Turn it on with <code>[newsletter] enabled = true</code> and the mail server settings in config.toml.</p>{{else if not (index .Data "MailReady")}}<p class="error">No mail server is set: add <code>smtp_host</code> and <code>from</code> under [newsletter].</p>{{end}}
+<dl class="figures">
+  <div><dt>Active</dt><dd>{{index $c "active"}}</dd></div>
+  <div><dt>Waiting to confirm</dt><dd>{{index $c "pending"}}</dd></div>
+  <div><dt>Unsubscribed</dt><dd>{{index $c "unsubscribed"}}</dd></div>
+  <div><dt>Bounced or complained</dt><dd>{{add (index $c "bounced") (index $c "complained")}}</dd></div>
+</dl>
+{{with index .Data "Reports"}}<h2 class="section">Sent posts</h2>
+<table class="rows"><thead><tr><th>Post</th><th class="num">Sent</th><th class="num">Failed</th><th class="num">Still to send</th><th class="num">Last</th></tr></thead>
+<tbody>{{range .}}<tr><td>{{or (index $titles .Post) .Post}}</td><td class="num">{{.Sent}}</td><td class="num">{{.Failed}}</td><td class="num">{{.Queued}}</td><td class="num">{{ago .Last}}</td></tr>{{end}}</tbody></table>{{end}}
+
+<div class="head-row spaced">
+  <h2 class="section">Addresses</h2>
+  <form method="get" class="inline search" role="search"><label class="visually-hidden" for="q">Find an address</label><input id="q" name="q" type="search" value="{{index .Data "Query"}}" placeholder="Find an address"></form>
+</div>
+{{with index .Data "Subs"}}<table class="rows"><thead><tr><th>Email</th><th>State</th><th class="num">Since</th><th class="actions"><span class="visually-hidden">Actions</span></th></tr></thead>
+<tbody>{{range .}}<tr><td>{{.Email}}</td><td><span class="state{{if eq .Status "active"}} ok{{else if or (eq .Status "bounced") (eq .Status "complained")}} bad{{end}}">{{.Status}}</span></td><td class="num">{{ago .CreatedAt}}</td>
+<td class="actions">{{if eq .Status "active"}}<form method="post" action="{{$.Base}}subscribers/action" class="inline"><input type="hidden" name="csrf" value="{{$.CSRF}}"><input type="hidden" name="id" value="{{.ID}}"><input type="hidden" name="action" value="unsubscribe"><button class="small secondary" type="submit">Unsubscribe</button></form>{{end}}
+<form method="post" action="{{$.Base}}subscribers/action" class="inline"><input type="hidden" name="csrf" value="{{$.CSRF}}"><input type="hidden" name="id" value="{{.ID}}"><input type="hidden" name="action" value="delete"><button class="small link danger" type="submit" title="Erase everything about this address">Erase</button></form></td></tr>{{end}}</tbody></table>
+{{else}}<p class="empty">No subscribers{{if index .Data "Query"}} match{{else}} yet{{end}}.</p>{{end}}{{end}}

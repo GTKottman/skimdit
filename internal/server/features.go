@@ -78,6 +78,8 @@ func (s *Server) registerFeatureJobs() {
 	s.jobHandlers["comment_reply"] = s.jobCommentReply
 	s.jobHandlers["webmention_verify"] = s.jobWebmentionVerify
 	s.jobHandlers["webmention_send"] = s.jobWebmentionSend
+	s.jobHandlers["newsletter_confirm"] = s.jobNewsletterConfirm
+	s.jobHandlers["newsletter"] = s.jobNewsletter
 	s.registerLaterJobs()
 }
 
@@ -86,6 +88,9 @@ func (s *Server) announceChannels() []string {
 	var out []string
 	if s.cfg.Webmention.Send {
 		out = append(out, "webmention_send")
+	}
+	if s.cfg.Newsletter.Enabled {
+		out = append(out, "newsletter")
 	}
 	return append(out, s.laterChannels()...)
 }
@@ -103,8 +108,20 @@ func (a *adminUI) featureRoutes(w http.ResponseWriter, r *http.Request, p string
 	case p == "/comments/action" && r.Method == http.MethodPost:
 		a.moderate(w, r)
 		return true
+	case p == "/subscribers":
+		a.subscribers(w, r)
+		return true
+	case p == "/subscribers/action" && r.Method == http.MethodPost:
+		a.subscribersAction(w, r)
+		return true
+	case p == "/subscribers.csv":
+		a.subscribersCSV(w, r)
+		return true
+	case p == "/stats":
+		a.statsPage(w, r)
+		return true
 	}
-	return a.laterRoutes(w, r, p)
+	return false
 }
 
 func (a *adminUI) pendingCounts() map[string]int {

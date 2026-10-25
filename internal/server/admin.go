@@ -64,6 +64,7 @@ func newAdminUI(s *Server) (*adminUI, error) {
 		"deref": func(b *bool) bool { return b != nil && *b },
 		// safe marks HTML that was sanitized before it was stored.
 		"safe": func(h string) template.HTML { return template.HTML(h) },
+		"add":  func(a, b int) int { return a + b },
 	}
 	layout, err := fs.ReadFile(adminFS, "admin/templates/layout.html")
 	if err != nil {

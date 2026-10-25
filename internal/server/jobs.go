@@ -53,7 +53,7 @@ func (s *Server) RunJobs(ctx context.Context) int {
 func (s *Server) workerLoop(ctx context.Context) {
 	tick := time.NewTicker(2 * time.Second)
 	defer tick.Stop()
-	var lastScan, lastClean time.Time
+	var lastScan, lastClean, lastBounce time.Time
 	for {
 		select {
 		case <-ctx.Done():
@@ -64,6 +64,14 @@ func (s *Server) workerLoop(ctx context.Context) {
 		if now.Sub(lastScan) >= 20*time.Second {
 			lastScan = now
 			s.enqueueDueDrafts()
+		}
+		if now.Sub(lastBounce) >= 30*time.Minute {
+			lastBounce = now
+			if n, err := s.checkBounces(); err != nil {
+				s.log.Printf("bounces: %v", err)
+			} else if n > 0 {
+				s.log.Printf("bounces: processed %d", n)
+			}
 		}
 		if now.Sub(lastClean) >= time.Hour {
 			lastClean = now
