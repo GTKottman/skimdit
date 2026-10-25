@@ -45,7 +45,7 @@ jobs:
         run: |
           python3 -m http.server 8137 --directory "$RUNNER_TEMP/sample" >/dev/null 2>&1 &
           sleep 1
-          npx --yes pa11y-ci@3.1.0 --config .github/pa11y.json
+          npx --yes pa11y-ci@4.1.1 --config .github/pa11y.json
 
   vulncheck:
     runs-on: ubuntu-latest

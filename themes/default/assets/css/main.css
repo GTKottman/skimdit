@@ -50,12 +50,12 @@
 @media (prefers-color-scheme: light) {
   :root:not([data-theme="dark"]) {
     --ink-0: #f6f3ec; --ink-1: #efebe2; --ink-2: #e8e3d8; --ink-3: #d8d2c4; --ink-4: #b9b2a2; --ink-5: #857f70;
-    --ink-6: #5c584f; --ink-9: #1c1b18; --link: color-mix(in oklab, var(--accent) 50%, #0b1a33); color-scheme: light;
+    --ink-6: #5c584f; --ink-9: #1c1b18; --link: color-mix(in oklab, var(--accent) 38%, #0b1a33); color-scheme: light;
   }
 }
 :root[data-theme="light"] {
   --ink-0: #f6f3ec; --ink-1: #efebe2; --ink-2: #e8e3d8; --ink-3: #d8d2c4; --ink-4: #b9b2a2; --ink-5: #857f70;
-  --ink-6: #5c584f; --ink-9: #1c1b18; --link: color-mix(in oklab, var(--accent) 50%, #0b1a33); color-scheme: light;
+  --ink-6: #5c584f; --ink-9: #1c1b18; --link: color-mix(in oklab, var(--accent) 38%, #0b1a33); color-scheme: light;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
