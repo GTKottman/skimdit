@@ -28,6 +28,11 @@ jobs:
       - run: go vet ./...
       - run: go test -race ./...
       - run: go build ./cmd/skimdit
+      - name: release build is static
+        if: runner.os == 'Linux'
+        run: |
+          CGO_ENABLED=0 go build -tags nodynamic -o "$RUNNER_TEMP/skimdit" ./cmd/skimdit
+          file "$RUNNER_TEMP/skimdit" | tee /dev/stderr | grep -q 'statically linked'
 
   theme:
     # Builds the theme-contract sample site and runs axe accessibility checks on every page type.

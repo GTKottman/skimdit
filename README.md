@@ -55,7 +55,7 @@ Everything below ships in 1.0. Each milestone must pass its checks before the ne
 ## Quick start
 
 ```sh
-go install github.com/GTKottman/skimdit/cmd/skimdit@latest
+go install -tags nodynamic github.com/GTKottman/skimdit/cmd/skimdit@latest
 skimdit init my-blog && cd my-blog
 skimdit new "My first post"
 skimdit dev            # http://127.0.0.1:1414, reloads as you write

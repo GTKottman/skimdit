@@ -9,6 +9,11 @@ builds:
     binary: skimdit
     env:
       - CGO_ENABLED=0
+    # nodynamic: encode images with the bundled WebAssembly codecs only. Without it the
+    # AVIF/WebP packages load system libraries through purego, which makes the binary
+    # dynamically linked (it then fails on Alpine) and its output machine-dependent.
+    tags:
+      - nodynamic
     flags:
       - -trimpath
     ldflags:

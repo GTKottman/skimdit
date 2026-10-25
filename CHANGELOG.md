@@ -4,6 +4,12 @@ All notable changes to Skimdit are documented here. The format follows [Keep a C
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-10-25
+
+### Fixed
+
+- Release binaries and the container image were dynamically linked against glibc (the image/codec libraries load system libraries through purego), so the Alpine-based image could not start. Release builds now use the `nodynamic` tag: static binaries, WebAssembly codecs only. CI checks the Linux build is static.
+
 ## [1.0.0] - 2026-10-25
 
 ### Added

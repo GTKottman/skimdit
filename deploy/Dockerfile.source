@@ -9,7 +9,7 @@ ARG SKIMDIT_REF=""
 RUN if [ -n "$SKIMDIT_REF" ]; then git checkout --quiet "$SKIMDIT_REF"; fi \
  && v=$(git describe --tags --always --dirty 2>/dev/null || echo source) \
  && c=$(git rev-parse --short HEAD 2>/dev/null || echo none) \
- && CGO_ENABLED=0 go build -trimpath -ldflags "-s -w -X github.com/GTKottman/skimdit/internal/version.Version=$v -X github.com/GTKottman/skimdit/internal/version.Commit=$c" -o /src/skimdit ./cmd/skimdit
+ && CGO_ENABLED=0 go build -tags nodynamic -trimpath -ldflags "-s -w -X github.com/GTKottman/skimdit/internal/version.Version=$v -X github.com/GTKottman/skimdit/internal/version.Commit=$c" -o /src/skimdit ./cmd/skimdit
 
 FROM alpine:3.22
 ARG TARGETARCH
