@@ -5,6 +5,8 @@ package markdown
 import (
 	"strings"
 	"testing"
+
+	"golang.org/x/net/html"
 )
 
 func render(t *testing.T, src string, hooks Hooks) *Doc {
@@ -191,4 +193,39 @@ func TestRenderComment(t *testing.T) {
 	out := RenderComment("Nice *post*! <script>x</script> ![img](https://evil/x.png) [link](https://ok.example) <b onclick=x>b</b>")
 	has(t, out, "<em>post</em>", `rel="nofollow`, `href="https://ok.example"`)
 	hasNot(t, out, "<script", "<img", "onclick")
+}
+
+func FuzzRenderComment(f *testing.F) {
+	f.Add("hello *world* <script>x</script> [a](javascript:x)")
+	f.Add("<img src=x onerror=y>")
+	f.Fuzz(func(t *testing.T, s string) {
+		if bad := unsafeMarkup(RenderComment(s)); bad != "" {
+			t.Fatalf("unsafe comment output for %q: %s", s, bad)
+		}
+	})
+}
+
+// unsafeMarkup inspects real tags and attributes (text may say anything).
+func unsafeMarkup(h string) string {
+	z := html.NewTokenizer(strings.NewReader(h))
+	for {
+		tt := z.Next()
+		if tt == html.ErrorToken {
+			return ""
+		}
+		if tt != html.StartTagToken && tt != html.SelfClosingTagToken {
+			continue
+		}
+		tok := z.Token()
+		switch tok.Data {
+		case "script", "iframe", "img", "style", "object", "embed", "form", "input", "svg", "math":
+			return "<" + tok.Data + ">"
+		}
+		for _, a := range tok.Attr {
+			v := strings.ToLower(strings.TrimSpace(a.Val))
+			if strings.HasPrefix(a.Key, "on") || a.Key == "style" || strings.HasPrefix(v, "javascript:") || strings.HasPrefix(v, "data:") {
+				return a.Key + "=" + a.Val
+			}
+		}
+	}
 }

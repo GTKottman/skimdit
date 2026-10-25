@@ -53,6 +53,7 @@ dockers:
       - "ghcr.io/gtkottman/skimdit:{{ .Version }}-amd64"
     use: buildx
     goarch: amd64
+    extra_files: [deploy/entrypoint.sh, deploy/known_hosts]
     build_flag_templates:
       - --platform=linux/amd64
       - --label=org.opencontainers.image.source=https://github.com/GTKottman/skimdit
@@ -61,6 +62,7 @@ dockers:
       - "ghcr.io/gtkottman/skimdit:{{ .Version }}-arm64"
     use: buildx
     goarch: arm64
+    extra_files: [deploy/entrypoint.sh, deploy/known_hosts]
     build_flag_templates:
       - --platform=linux/arm64
       - --label=org.opencontainers.image.source=https://github.com/GTKottman/skimdit

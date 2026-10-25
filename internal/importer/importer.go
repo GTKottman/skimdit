@@ -22,6 +22,7 @@ import (
 	"time"
 
 	"github.com/GTKottman/skimdit/internal/content"
+	"github.com/GTKottman/skimdit/internal/media"
 	htmltomarkdown "github.com/JohannesKaufmann/html-to-markdown/v2"
 )
 
@@ -252,7 +253,11 @@ func fetchImage(src, dir string, opts Options) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	if !bytes.HasPrefix([]byte(http.DetectContentType(data)), []byte("image/")) && ext != ".svg" {
+	if ext == ".svg" {
+		if _, err := media.CheckSVG(data); err != nil {
+			return "", err
+		}
+	} else if !bytes.HasPrefix([]byte(http.DetectContentType(data)), []byte("image/")) {
 		return "", fmt.Errorf("the download is not an image")
 	}
 	return name, os.WriteFile(dst, data, 0o644)

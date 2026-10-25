@@ -123,7 +123,7 @@ func (s *Server) postComment(w http.ResponseWriter, r *http.Request) {
 		httpError(w, http.StatusNotFound, "comments are off")
 		return
 	}
-	if !s.postLimit.allow("comment:"+ip, s.now()) {
+	if !s.postLimit.allow("comment:"+limitKey(ip), s.now()) {
 		s.notice(w, http.StatusTooManyRequests, "Slow down", "You sent several comments in a short time. Wait a few minutes and try again.", "")
 		return
 	}

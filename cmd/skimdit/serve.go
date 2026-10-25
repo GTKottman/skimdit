@@ -45,6 +45,9 @@ func cmdServe(args []string, stdout, stderr io.Writer) error {
 		return err
 	}
 	addr := cfg.Server.Listen
+	if env := os.Getenv("SKIMDIT_LISTEN"); env != "" {
+		addr = env
+	}
 	if *listen != "" {
 		addr = *listen
 	}

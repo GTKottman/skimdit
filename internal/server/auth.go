@@ -162,8 +162,12 @@ func (s *Server) loginBlocked(ip string) (bool, string) {
 	if n, _ := s.store.FailedLogins(ip, since); n >= ipFailLimit {
 		return true, "Too many failed attempts from your address. Wait 15 minutes, or sign in with a passkey."
 	}
-	if n, _ := s.store.FailedLogins("", s.now().Add(-time.Hour).Unix()); n >= globalFailLimit {
-		return true, "Password sign-in is paused because of many failed attempts. Use a passkey, or wait an hour."
+	// Addresses the owner signed in from recently are never caught by the
+	// site-wide pause, so an attacker cannot lock the owner out.
+	if !s.store.RecentSuccess(ip, s.now().Add(-30*24*time.Hour).Unix()) {
+		if n, _ := s.store.FailedLogins("", s.now().Add(-time.Hour).Unix()); n >= globalFailLimit {
+			return true, "Password sign-in is paused because of many failed attempts. Use a passkey, or wait an hour."
+		}
 	}
 	if !s.loginLimit.allow(ip, s.now()) {
 		return true, "Too many attempts. Wait a few minutes."
@@ -175,7 +179,7 @@ func failDelay() { time.Sleep(400*time.Millisecond + time.Duration(rand.IntN(400
 
 // passwordLogin checks a password (and the TOTP code when enabled).
 func (s *Server) passwordLogin(r *http.Request, password, code string) error {
-	ip := s.clientIP(r)
+	ip := limitKey(s.clientIP(r))
 	if blocked, msg := s.loginBlocked(ip); blocked {
 		return errors.New(msg)
 	}
@@ -299,7 +303,7 @@ func (s *Server) passkeyLoginBegin(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "no passkeys are set up; sign in with your password"})
 		return
 	}
-	if !s.loginLimit.allow(s.clientIP(r), s.now()) {
+	if !s.loginLimit.allow(limitKey(s.clientIP(r)), s.now()) {
 		writeJSON(w, http.StatusTooManyRequests, map[string]string{"error": "too many attempts; wait a few minutes"})
 		return
 	}
@@ -336,7 +340,7 @@ func (s *Server) passkeyLoginFinish(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	cred, err := s.wa.FinishLogin(o, *data, r)
-	ip := s.clientIP(r)
+	ip := limitKey(s.clientIP(r))
 	if err != nil {
 		_ = s.store.RecordLogin(ip, false)
 		failDelay()

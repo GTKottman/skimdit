@@ -413,12 +413,16 @@ func (s *Server) handleActivity(ctx context.Context, act *activity) error {
 			return err
 		}
 		if json.Unmarshal(act.Object, &inner) == nil && (inner.Type == "Like" || inner.Type == "Announce") {
-			_, err := s.store.DB.Exec(`UPDATE webmentions SET status = 'deleted' WHERE source = ?`, inner.ID)
+			_, err := s.store.DB.Exec(`UPDATE webmentions SET status = 'deleted' WHERE source = ? AND actor = ?`, inner.ID, act.Actor)
 			return err
 		}
 	case "Create", "Update":
 		if obj.InReplyTo == "" {
 			return nil
+		}
+		// An actor may only speak for objects on its own server.
+		if !sameHost(obj.ID, act.Actor) {
+			return errors.New("object is not on the actor's server")
 		}
 		e := s.entryForObject(obj.InReplyTo)
 		if e == nil {
@@ -430,6 +434,9 @@ func (s *Server) handleActivity(ctx context.Context, act *activity) error {
 		}
 		return s.saveFediverseResponse(obj.ID, e, "reply", a, obj.Content, obj.Published, urlOf(obj.URL, obj.ID))
 	case "Like", "Announce":
+		if !sameHost(act.ID, act.Actor) {
+			return errors.New("activity is not on the actor's server")
+		}
 		e := s.entryForObject(objID)
 		if e == nil {
 			return nil
@@ -445,7 +452,7 @@ func (s *Server) handleActivity(ctx context.Context, act *activity) error {
 			_, err := s.store.DB.Exec(`DELETE FROM ap_followers WHERE actor = ?`, act.Actor)
 			return err
 		}
-		res, err := s.store.DB.Exec(`UPDATE webmentions SET status = 'deleted' WHERE source = ? AND status != 'deleted'`, objID)
+		res, err := s.store.DB.Exec(`UPDATE webmentions SET status = 'deleted' WHERE source = ? AND actor = ? AND status != 'deleted'`, objID, act.Actor)
 		if n, _ := res.RowsAffected(); n > 0 {
 			s.requestRebuild()
 		}
@@ -490,6 +497,15 @@ func (s *Server) entryForObject(id string) *site.Entry {
 func (s *Server) saveFediverseResponse(source string, e *site.Entry, kind string, a *remoteActor, content, published, link string) error {
 	id, err := s.store.UpsertWebmention(source, e.Permalink, e.Slug)
 	if err != nil {
+		return err
+	}
+	// Only the actor that created a response may change it.
+	var owner string
+	_ = s.store.DB.QueryRow(`SELECT actor FROM webmentions WHERE id = ?`, id).Scan(&owner)
+	if owner != "" && owner != a.ID {
+		return errors.New("this response belongs to another actor")
+	}
+	if _, err := s.store.DB.Exec(`UPDATE webmentions SET actor = ? WHERE id = ?`, a.ID, id); err != nil {
 		return err
 	}
 	wm, err := s.store.Webmention(id)
@@ -590,4 +606,11 @@ func (s *Server) announceDelete(slug string) {
 		payload, _ := json.Marshal(map[string]any{"inbox": inbox, "activity": del})
 		_, _ = s.store.Enqueue("ap_send", "ap_send:delete:"+slug+":"+inbox, string(payload), 0)
 	}
+}
+
+// sameHost reports whether two URLs are on the same host.
+func sameHost(a, b string) bool {
+	ua, err1 := url.Parse(a)
+	ub, err2 := url.Parse(b)
+	return err1 == nil && err2 == nil && ua.Host != "" && strings.EqualFold(ua.Host, ub.Host)
 }

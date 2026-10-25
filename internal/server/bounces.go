@@ -106,7 +106,7 @@ func (s *Server) checkBounces() (int, error) {
 			continue
 		}
 		raw, _ := io.ReadAll(io.LimitReader(r, 2<<20))
-		if b := parseBounce(raw); b != nil {
+		if b := parseBounce(raw); b != nil && s.ourBounce(raw) {
 			s.applyBounce(b)
 			n++
 		}
@@ -116,4 +116,11 @@ func (s *Server) checkBounces() (int, error) {
 	}
 	// Fetching the body marks messages as seen.
 	return n, nil
+}
+
+// ourBounce reports whether a bounce quotes one of our own Message-IDs
+// (they all end in @<site domain>), so a forged report cannot unsubscribe
+// someone.
+func (s *Server) ourBounce(raw []byte) bool {
+	return strings.Contains(strings.ToLower(string(raw)), "@"+strings.ToLower(s.cfg.Domain())+">")
 }

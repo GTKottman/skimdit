@@ -12,6 +12,7 @@ import (
 	"html/template"
 	"io/fs"
 	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
 	"sort"
@@ -303,10 +304,26 @@ func (a *adminUI) login(w http.ResponseWriter, r *http.Request) {
 
 // safeNext only allows redirects back into the admin.
 func safeNext(next, fallback string) string {
-	if strings.HasPrefix(next, "/") && !strings.HasPrefix(next, "//") && strings.Contains(next, "/admin/") && !strings.ContainsAny(next, "\\\r\n") {
-		return next
+	if !strings.Contains(next, "/admin/") || !localPath(next) {
+		return fallback
 	}
-	return fallback
+	return next
+}
+
+// localPath accepts a path on this site only: no scheme, no host, no
+// backslashes or control characters (browsers drop tabs, which would turn
+// "/<tab>/x" into "//x").
+func localPath(p string) bool {
+	if !strings.HasPrefix(p, "/") || strings.HasPrefix(p, "//") || strings.ContainsRune(p, '\\') {
+		return false
+	}
+	for _, r := range p {
+		if r < 0x20 || r == 0x7f {
+			return false
+		}
+	}
+	u, err := url.Parse(p)
+	return err == nil && u.Scheme == "" && u.Host == "" && !strings.HasPrefix(u.Path, "//")
 }
 
 // ---- dashboard ----

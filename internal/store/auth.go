@@ -182,3 +182,10 @@ func (s *Store) Cleanup() error {
 	_, err := s.DB.Exec(`DELETE FROM login_attempts WHERE created_at < ?`, now-30*86400)
 	return err
 }
+
+// RecentSuccess reports whether a sign-in from this address succeeded since a time.
+func (s *Store) RecentSuccess(ip string, since int64) bool {
+	var n int
+	_ = s.DB.QueryRow(`SELECT COUNT(*) FROM login_attempts WHERE ok = 1 AND ip = ? AND created_at >= ?`, ip, since).Scan(&n)
+	return n > 0
+}

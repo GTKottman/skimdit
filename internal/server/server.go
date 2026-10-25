@@ -110,6 +110,10 @@ func New(opts Options) (*Server, error) {
 		opts.HTTPClient = safeHTTPClient()
 	}
 	data := cfg.Path(cfg.Server.Data)
+	if d := os.Getenv("SKIMDIT_DATA"); d != "" {
+		// Containers keep state on a volume outside the site checkout.
+		data = d
+	}
 	st, err := store.Open(data)
 	if err != nil {
 		return nil, fmt.Errorf("database: %w", err)

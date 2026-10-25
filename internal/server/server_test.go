@@ -387,6 +387,29 @@ func TestScheduledPublish(t *testing.T) {
 	}
 }
 
+func TestSafeNext(t *testing.T) {
+	for _, bad := range []string{"/\t/evil.example/admin/", "//evil.example/admin/", "https://evil.example/admin/", "/\\evil.example/admin/", "/admin/\r\nX: y", "javascript:alert(1)//admin/"} {
+		if got := safeNext(bad, "/admin/"); got != "/admin/" {
+			t.Errorf("safeNext(%q) = %q", bad, got)
+		}
+	}
+	if got := safeNext("/admin/drafts/3", "/admin/"); got != "/admin/drafts/3" {
+		t.Errorf("good path rejected: %q", got)
+	}
+}
+
+func TestLimitKeyAndCSV(t *testing.T) {
+	if limitKey("2001:db8:1:2:aaaa::1") != limitKey("2001:db8:1:2:bbbb::9") || limitKey("2001:db8:1:3::1") == limitKey("2001:db8:1:2::1") {
+		t.Error("IPv6 addresses not grouped by /64")
+	}
+	if limitKey("1.2.3.4") != "1.2.3.4" {
+		t.Error("IPv4 changed")
+	}
+	if csvCell("=HYPERLINK(1)") != "'=HYPERLINK(1)" || csvCell("a@b.c") != "a@b.c" {
+		t.Error("csv cell not escaped")
+	}
+}
+
 func TestPasswordHashing(t *testing.T) {
 	if _, err := HashPassword("short"); err == nil {
 		t.Error("short password accepted")
@@ -423,6 +446,7 @@ func TestSVGSanitizer(t *testing.T) {
 		`<svg xmlns="http://www.w3.org/2000/svg"><a href="javascript:x()"><rect/></a></svg>`,
 		`<svg xmlns="http://www.w3.org/2000/svg"><image href="https://evil/x.png"/></svg>`,
 		`<!DOCTYPE svg [<!ENTITY x "y">]><svg xmlns="http://www.w3.org/2000/svg"/>`,
+		`<!DOCTYPE svg [<!ATTLIST svg onload CDATA "alert(1)">]><svg xmlns="http://www.w3.org/2000/svg"/>`,
 		`<html/>`,
 	} {
 		if _, err := sanitizeSVG([]byte(bad)); err == nil {

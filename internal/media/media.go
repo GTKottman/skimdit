@@ -205,6 +205,9 @@ func encode(key, path string, data []byte, cfg Settings) (*Result, map[string][]
 	ext := strings.ToLower(filepath.Ext(path))
 	files := map[string][]byte{}
 	if ext == ".svg" {
+		if _, err := CheckSVG(data); err != nil {
+			return nil, nil, err
+		}
 		w, h := svgSize(data)
 		name := key + "-0.svg"
 		files[name] = data

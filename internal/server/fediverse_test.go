@@ -208,6 +208,24 @@ func TestFediverse(t *testing.T) {
 		t.Fatalf("deleted reply still shown: %+v", gone)
 	}
 
+	// Another server cannot speak for alice's reply: not to rewrite it, not to delete it.
+	evil := newFakeFedi(t)
+	h.srv.store.DB.Exec(`UPDATE webmentions SET status = 'approved' WHERE status = 'deleted'`)
+	if code := evil.send(t, h, map[string]any{"id": evil.srv.URL + "/x", "type": "Update", "actor": evil.actor(),
+		"object": map[string]any{"id": f.srv.URL + "/notes/1", "type": "Note", "content": "<p>pwned</p>", "inReplyTo": "https://blog.example/ap/posts/hello-fediverse"}}, evil.key); code != http.StatusAccepted {
+		t.Fatalf("evil update: %d", code)
+	}
+	evil.send(t, h, map[string]any{"id": evil.srv.URL + "/d", "type": "Delete", "actor": evil.actor(), "object": f.srv.URL + "/notes/1"}, evil.key)
+	approved, _ := h.srv.store.Webmentions("approved", 10)
+	for _, w := range approved {
+		if strings.Contains(w.HTML, "pwned") {
+			t.Fatal("another actor rewrote alice's reply")
+		}
+	}
+	if len(approved) != 2 {
+		t.Fatalf("another actor deleted alice's responses: %d left", len(approved))
+	}
+
 	// Unfollow.
 	f.send(t, h, map[string]any{"id": f.actor() + "#undo-1", "type": "Undo", "actor": f.actor(), "object": follow}, f.key)
 	if n, _ := h.srv.followerInboxes(); len(n) != 0 {

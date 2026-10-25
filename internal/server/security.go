@@ -257,3 +257,13 @@ func (s *Server) securityHeaders(w http.ResponseWriter, r *http.Request, admin b
 		h.Set("X-Robots-Tag", "noindex, nofollow")
 	}
 }
+
+// limitKey groups an address for rate limits: one IPv4 address, or one
+// IPv6 /64 (a single customer usually gets a whole /64).
+func limitKey(ip string) string {
+	p := net.ParseIP(ip)
+	if p == nil || p.To4() != nil {
+		return ip
+	}
+	return p.Mask(net.CIDRMask(64, 128)).String() + "/64"
+}

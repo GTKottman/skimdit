@@ -136,6 +136,12 @@ func TestBouncesTurnOffSubscribers(t *testing.T) {
 		h.srv.applyBounce(&Bounce{Email: "b@x.org"})
 	}
 	h.srv.applyBounce(&Bounce{Email: "c@x.org", Complaint: true})
+	if h.srv.ourBounce([]byte("Final-Recipient: rfc822; a@x.org\r\nStatus: 5.1.1\r\nMessage-ID: <abc@elsewhere.example>")) {
+		t.Error("a bounce of someone else's mail was accepted")
+	}
+	if !h.srv.ourBounce([]byte("Final-Recipient: rfc822; a@x.org\r\nStatus: 5.1.1\r\n\r\nMessage-ID: <post-x-1@blog.example>")) {
+		t.Error("a bounce of our own mail was refused")
+	}
 	c := st.SubscriberCounts()
 	if c["bounced"] != 2 || c["complained"] != 1 || c["active"] != 0 {
 		t.Fatalf("counts: %v", c)

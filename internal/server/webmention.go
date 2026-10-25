@@ -30,7 +30,7 @@ func (s *Server) receiveWebmention(w http.ResponseWriter, r *http.Request) {
 		httpError(w, http.StatusNotFound, "webmentions are off")
 		return
 	}
-	if !s.apiLimit.allow("wm:"+s.clientIP(r), s.now()) {
+	if !s.apiLimit.allow("wm:"+limitKey(s.clientIP(r)), s.now()) {
 		httpError(w, http.StatusTooManyRequests, "too many webmentions; slow down")
 		return
 	}

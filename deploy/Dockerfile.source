@@ -1,0 +1,37 @@
+# Builds the Skimdit server image from source:
+#   docker build -f deploy/Dockerfile.source -t skimdit .
+# Pass --build-arg SKIMDIT_REF=v1.0.0 to build a tagged version.
+FROM golang:1.27-alpine AS build
+RUN apk add --no-cache git
+WORKDIR /src
+COPY . .
+ARG SKIMDIT_REF=""
+RUN if [ -n "$SKIMDIT_REF" ]; then git checkout --quiet "$SKIMDIT_REF"; fi \
+ && v=$(git describe --tags --always --dirty 2>/dev/null || echo source) \
+ && c=$(git rev-parse --short HEAD 2>/dev/null || echo none) \
+ && CGO_ENABLED=0 go build -trimpath -ldflags "-s -w -X github.com/GTKottman/skimdit/internal/version.Version=$v -X github.com/GTKottman/skimdit/internal/version.Commit=$c" -o /src/skimdit ./cmd/skimdit
+
+FROM alpine:3.22
+ARG TARGETARCH
+ARG LITESTREAM_VERSION=0.5.17
+RUN apk add --no-cache git ca-certificates tzdata openssh-client \
+ && case "${TARGETARCH:-amd64}" in \
+      amd64) arch=x86_64; sum=cfb371176d164437ae869f8351cfde49bd1804ae71c61923f75c9cba9c9c006d ;; \
+      arm64) arch=arm64;  sum=f8ca4a050095c1efbda2c4365172e61bf9d955ea0d9ac42f448b52e51819baa5 ;; \
+      *) echo "unsupported arch $TARGETARCH" >&2; exit 1 ;; \
+    esac \
+ && wget -q -O /tmp/ls.tgz "https://github.com/benbjohnson/litestream/releases/download/v${LITESTREAM_VERSION}/litestream-${LITESTREAM_VERSION}-linux-${arch}.tar.gz" \
+ && echo "$sum  /tmp/ls.tgz" | sha256sum -c - \
+ && tar -xzf /tmp/ls.tgz -C /usr/local/bin litestream \
+ && rm /tmp/ls.tgz \
+ && adduser -D -u 10001 skimdit \
+ && mkdir -p /data /etc/skimdit && chown skimdit /data
+COPY deploy/known_hosts /etc/skimdit/known_hosts
+COPY deploy/entrypoint.sh /usr/local/bin/skimdit-entrypoint
+COPY --from=build /src/skimdit /usr/local/bin/skimdit
+USER skimdit
+ENV HOME=/home/skimdit
+VOLUME /data
+EXPOSE 8080
+HEALTHCHECK --interval=30s --timeout=5s --start-period=60s CMD wget -q -O /dev/null http://127.0.0.1:8080/healthz || exit 1
+ENTRYPOINT ["/usr/local/bin/skimdit-entrypoint"]

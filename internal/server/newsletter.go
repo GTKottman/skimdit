@@ -44,15 +44,17 @@ func (s *Server) subscribe(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	ip := s.clientIP(r)
-	if !s.postLimit.allow("subscribe:"+ip, s.now()) {
+	if !s.postLimit.allow("subscribe:"+limitKey(ip), s.now()) {
 		s.notice(w, http.StatusTooManyRequests, "Slow down", "Too many sign-ups from your connection. Try again in a few minutes.", back)
 		return
 	}
 	r.Body = http.MaxBytesReader(w, r.Body, 8<<10)
 	email := strings.TrimSpace(r.FormValue("email"))
 	source := truncate(r.FormValue("source"), 200)
-	if strings.HasPrefix(source, "/") {
+	if localPath(source) {
 		back = source
+	} else {
+		source = ""
 	}
 	done := func() {
 		s.notice(w, http.StatusOK, "Check your inbox", "Almost done: click the link in the email we just sent to confirm. Nothing is sent until you do.", back)
@@ -276,7 +278,15 @@ func (a *adminUI) subscribersCSV(w http.ResponseWriter, r *http.Request) {
 		if x.ConsentAt > 0 {
 			consent = time.Unix(x.ConsentAt, 0).UTC().Format(time.RFC3339)
 		}
-		_ = cw.Write([]string{x.Email, x.Status, time.Unix(x.CreatedAt, 0).UTC().Format(time.RFC3339), consent, x.ConsentSource})
+		_ = cw.Write([]string{csvCell(x.Email), x.Status, time.Unix(x.CreatedAt, 0).UTC().Format(time.RFC3339), consent, csvCell(x.ConsentSource)})
 	}
 	cw.Flush()
+}
+
+// csvCell stops spreadsheet apps from running a cell as a formula.
+func csvCell(v string) string {
+	if v != "" && strings.ContainsRune("=+-@\t\r", rune(v[0])) {
+		return "'" + v
+	}
+	return v
 }
