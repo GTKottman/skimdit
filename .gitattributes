@@ -1,0 +1,9 @@
+# Keep LF everywhere: theme assets are hashed and golden files are compared byte for byte.
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.webp binary
+*.avif binary
+*.woff2 binary
+*.pdf binary
+*.wasm binary
