@@ -11,7 +11,7 @@ import (
 )
 
 // Fields lists every frontmatter key, for validation and docs.
-var Fields = []string{
+var FieldNames = []string{
 	"title", "slug", "date", "updated", "status", "tags", "series", "series_order",
 	"excerpt", "description", "cover", "cover_alt", "social_image", "aliases", "canonical", "lang",
 	"toc", "comments", "schema_version", "extra",
@@ -19,7 +19,7 @@ var Fields = []string{
 
 var fieldSet = func() map[string]bool {
 	m := map[string]bool{}
-	for _, f := range Fields {
+	for _, f := range FieldNames {
 		m[f] = true
 	}
 	return m
@@ -252,7 +252,7 @@ func date(v *yaml.Node, key string, loc *time.Location, errAt errFunc) time.Time
 // closest suggests a known field for a typo, using edit distance.
 func closest(s string) string {
 	best, bestD := "", 3
-	for _, f := range Fields {
+	for _, f := range FieldNames {
 		if d := editDistance(s, f); d < bestD {
 			best, bestD = f, d
 		}

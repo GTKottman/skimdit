@@ -28,8 +28,10 @@ import (
 	"github.com/GTKottman/skimdit/internal/locale"
 	"github.com/GTKottman/skimdit/internal/markdown"
 	"github.com/GTKottman/skimdit/internal/media"
+	"github.com/GTKottman/skimdit/internal/plugins"
 	"github.com/GTKottman/skimdit/internal/theme"
 	"github.com/GTKottman/skimdit/internal/version"
+	"github.com/GTKottman/skimdit/plugin"
 )
 
 // Options control a build.
@@ -95,6 +97,7 @@ type Build struct {
 	mediaRes    map[string]*media.Result
 	mmu         sync.Mutex
 	tmp         string
+	plugins     *plugins.Host
 	siteCSS     string
 	siteCSSPath string
 	directive   map[string]*template.Template
@@ -169,6 +172,20 @@ func newBuild(opts Options) (*Build, error) {
 		mediaRes: map[string]*media.Result{},
 	}
 	b.Opts.Workers = workers
+	if len(cfg.Plugins) > 0 {
+		specs := make([]struct {
+			Path   string
+			Config map[string]any
+		}, len(cfg.Plugins))
+		for i, p := range cfg.Plugins {
+			specs[i].Path, specs[i].Config = p.Path, p.Config
+		}
+		host, err := plugins.Load(cfg.Root, specs)
+		if err != nil {
+			return nil, err
+		}
+		b.plugins = host
+	}
 	th, err := theme.Load(cfg.Root, cfg.Theme.Name, b.funcs())
 	if err != nil {
 		return nil, err
@@ -191,6 +208,7 @@ func (b *Build) warn(file string, line int, format string, args ...any) {
 }
 
 func (b *Build) run() (*Result, error) {
+	defer b.plugins.Close()
 	cfg := b.Config
 	items, diags := content.Load(cfg.Root, cfg.Path(cfg.Build.Content), cfg.Location)
 	b.Diags = append(b.Diags, diags...)
@@ -240,6 +258,7 @@ func (b *Build) run() (*Result, error) {
 		b.robots,
 		b.searchIndexIfOn,
 		b.redirectsFile,
+		b.pluginFiles,
 		b.writeCopies,
 		b.writeMedia,
 	}
@@ -434,6 +453,19 @@ func (b *Build) renderEntry(e *Entry) {
 			line = it.BodyLine + d.Line - 1
 		}
 		b.diag(it.Source, line, d.Warning, "%s", d.Message)
+	}
+	if b.plugins != nil {
+		var tags []string
+		for _, t := range it.Tags {
+			tags = append(tags, t)
+		}
+		out, err := b.plugins.PostRender(plugin.Post{Slug: e.Slug, Title: e.Title, URL: e.URL, Tags: tags, HTML: doc.HTML})
+		if err != nil {
+			b.diag(it.Source, 0, false, "%v", err)
+		} else {
+			// Plugins may change the text, never add scripts.
+			doc.HTML = markdown.Sanitize(out)
+		}
 	}
 	e.doc = doc
 	e.Content = template.HTML(doc.HTML)
@@ -646,7 +678,11 @@ func (b *Build) directiveHook() func(string, map[string]string, string) (string,
 	return func(name string, attrs map[string]string, inner string) (string, bool, error) {
 		t, ok := b.directive[name]
 		if !ok {
-			return "", false, nil
+			out, ok, err := b.plugins.Directive(name, attrs, inner)
+			if err != nil || !ok {
+				return "", ok, err
+			}
+			return markdown.Sanitize(out), true, nil
 		}
 		var buf bytes.Buffer
 		if err := t.Execute(&buf, DirectiveData{Attrs: attrs, Inner: template.HTML(inner)}); err != nil {
@@ -1007,3 +1043,35 @@ func (b *Build) Media() *media.Pipeline { return b.media }
 
 // Markdown returns the renderer, for the editor preview.
 func (b *Build) Markdown() *markdown.Renderer { return b.md }
+
+// pluginFiles writes the extra files build_done plugins ask for.
+func (b *Build) pluginFiles() error {
+	if b.plugins == nil {
+		return nil
+	}
+	info := plugin.BuildDone{Site: b.Config.Site.Title, URL: b.Site.URL}
+	for _, e := range b.Posts {
+		var tags []string
+		for _, t := range e.Tags {
+			tags = append(tags, t.Name)
+		}
+		info.Posts = append(info.Posts, plugin.Post{Slug: e.Slug, Title: e.Title, URL: e.URL, Tags: tags})
+	}
+	b.fmu.Lock()
+	for f := range b.files {
+		info.Files = append(info.Files, f)
+	}
+	b.fmu.Unlock()
+	sort.Strings(info.Files)
+	files, err := b.plugins.BuildDone(info)
+	if err != nil {
+		b.diag("", 0, false, "%v", err)
+		return nil
+	}
+	for _, f := range files {
+		if err := b.write(f.Path, []byte(f.Content), "plugin"); err != nil {
+			return err
+		}
+	}
+	return nil
+}

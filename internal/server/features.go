@@ -28,6 +28,8 @@ func (s *Server) apiHandler() http.Handler {
 			s.unsubscribeCommentNotify(w, r)
 		case p == "/hooks/git" && r.Method == http.MethodPost:
 			s.gitWebhook(w, r)
+		case strings.HasPrefix(p, "/plugins/"):
+			s.pluginRoute(w, r, strings.TrimPrefix(p, "/plugins/"))
 		default:
 			if s.newsletterRoutes(w, r, p) {
 				return

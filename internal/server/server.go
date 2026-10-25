@@ -21,6 +21,7 @@ import (
 	"time"
 
 	"github.com/GTKottman/skimdit/internal/config"
+	"github.com/GTKottman/skimdit/internal/plugins"
 	"github.com/GTKottman/skimdit/internal/site"
 	"github.com/GTKottman/skimdit/internal/store"
 	"github.com/go-webauthn/webauthn/webauthn"
@@ -77,6 +78,7 @@ type Server struct {
 	admin       *adminUI
 	stats       *statsCounter
 	testMailer  Mailer
+	plugins     *plugins.Host
 	powUsed     map[string]time.Time
 	powMu       sync.Mutex
 }
@@ -146,6 +148,9 @@ func New(opts Options) (*Server, error) {
 	if _, err := st.Credentials(); errors.Is(err, store.ErrNotFound) {
 		s.setupToken = randomToken(24)
 	}
+	if err := s.loadPlugins(); err != nil {
+		return nil, err
+	}
 	s.registerJobs()
 	s.admin, err = newAdminUI(s)
 	if err != nil {
@@ -162,8 +167,11 @@ func New(opts Options) (*Server, error) {
 	return s, nil
 }
 
-// Close releases the database.
-func (s *Server) Close() error { return s.store.Close() }
+// Close releases the database and plugins.
+func (s *Server) Close() error {
+	s.plugins.Close()
+	return s.store.Close()
+}
 
 // Store exposes the database (tests and commands).
 func (s *Server) Store() *store.Store { return s.store }
