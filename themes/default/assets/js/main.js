@@ -159,6 +159,20 @@
     if (q) { input.value = q; run(); }
   }
 
+  // Reply buttons fill in which comment a new comment answers.
+  doc.querySelectorAll("[data-reply]").forEach(function (b) {
+    b.hidden = false;
+    b.addEventListener("click", function () {
+      var f = doc.querySelector(".comment-form");
+      if (!f) return;
+      f.querySelector("input[name=parent]").value = b.getAttribute("data-reply");
+      var note = f.querySelector(".replying-to");
+      note.textContent = "\u21b3 " + b.getAttribute("data-author");
+      note.hidden = false;
+      f.querySelector("textarea").focus();
+    });
+  });
+
   // Comment form proof-of-work: find a nonce whose SHA-256 has N leading zero bits.
   doc.querySelectorAll("form[data-pow]").forEach(function (f) {
     f.addEventListener("submit", function (ev) {

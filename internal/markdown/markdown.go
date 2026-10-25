@@ -669,3 +669,17 @@ func parseInfo(info string) (string, map[string]string) {
 
 // Sanitize cleans author HTML with the content allow-list.
 func Sanitize(s string) string { return contentPolicy().Sanitize(s) }
+
+// RenderComment renders reader-written Markdown (comments): no raw HTML,
+// no images, no directives, links marked nofollow ugc.
+func RenderComment(src string) string {
+	md := goldmark.New(
+		goldmark.WithExtensions(extension.Strikethrough, extension.Linkify),
+		goldmark.WithRendererOptions(gmhtml.WithHardWraps()),
+	)
+	var buf bytes.Buffer
+	if err := md.Convert([]byte(src), &buf); err != nil {
+		return ""
+	}
+	return CommentPolicy().Sanitize(buf.String())
+}

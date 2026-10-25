@@ -11,12 +11,12 @@
 <meta name="theme-color" content="#0e0f12" media="(prefers-color-scheme: dark)">
 <meta name="theme-color" content="#f7f6f2" media="(prefers-color-scheme: light)">
 <meta name="generator" content="Skimdit 0.0.0-dev">
-<script src="/assets/ee1d5aca00/js/theme-init.js"></script>
-<link rel="stylesheet" href="/assets/ee1d5aca00/css/main.css">
-<link rel="stylesheet" href="/assets/ee1d5aca00/katex/katex.min.css"><link rel="stylesheet" href="/assets/ee1d5aca00/css/code.css">
+<script src="/assets/ef4fd2bfac/js/theme-init.js"></script>
+<link rel="stylesheet" href="/assets/ef4fd2bfac/css/main.css">
+<link rel="stylesheet" href="/assets/ef4fd2bfac/katex/katex.min.css"><link rel="stylesheet" href="/assets/ef4fd2bfac/css/code.css">
 <link rel="stylesheet" href="/assets/site-e217e250d8.css">
-<script src="/assets/ee1d5aca00/js/main.js" defer></script>
-<link rel="icon" href="/assets/ee1d5aca00/img/favicon.svg" type="image/svg+xml">
+<script src="/assets/ef4fd2bfac/js/main.js" defer></script>
+<link rel="icon" href="/assets/ef4fd2bfac/img/favicon.svg" type="image/svg+xml">
 <link rel="alternate" type="application/atom&#43;xml" title="Fixture Blog (Atom)" href="/feed.xml">
 <link rel="alternate" type="application/rss&#43;xml" title="Fixture Blog (RSS)" href="/rss.xml">
 <link rel="alternate" type="application/feed&#43;json" title="Fixture Blog (JSON Feed)" href="/feed.json">
@@ -137,11 +137,17 @@
     </nav>
   </footer>
   
+
 <section class="responses" id="responses" aria-labelledby="responses-title">
   <h2 id="responses-title">Comments</h2>
+  
+  
+  
   <p class="reply-email"><a href="mailto:ada@fixture.example?subject=Re%3A%20Alpha%3A%20the%20first%20post">Reply by email</a></p>
   <form class="comment-form" method="post" action="/api/comments" data-pow>
     <input type="hidden" name="post" value="alpha">
+    <input type="hidden" name="parent" value="">
+    <p class="form-note replying-to" hidden></p>
     <p class="form-note">Comments are checked before they appear.</p>
     <label for="c-name">Name</label>
     <input id="c-name" name="name" required maxlength="80" autocomplete="name">

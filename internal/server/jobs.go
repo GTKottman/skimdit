@@ -69,6 +69,7 @@ func (s *Server) workerLoop(ctx context.Context) {
 			lastClean = now
 			_ = s.store.Cleanup()
 			_ = s.store.PruneJobs(30 * 86400)
+			_ = s.store.ForgetCommentIPs(s.now().Add(-30 * 24 * time.Hour).Unix())
 		}
 		for s.RunJobs(ctx) > 0 {
 		}

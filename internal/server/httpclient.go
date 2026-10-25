@@ -93,7 +93,7 @@ func (s *Server) fetch(ctx context.Context, url, accept string, max int64) ([]by
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode >= 400 {
-		return nil, resp.Header, resp.Request.URL.String(), fmt.Errorf("%s answered %s", url, resp.Status)
+		return nil, resp.Header, resp.Request.URL.String(), &statusError{url: url, code: resp.StatusCode}
 	}
 	b, err := readLimited(resp.Body, max)
 	return b, resp.Header, resp.Request.URL.String(), err

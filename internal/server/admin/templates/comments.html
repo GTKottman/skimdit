@@ -1,0 +1,40 @@
+{{define "content"}}{{$show := index .Data "Show"}}{{$titles := index .Data "Titles"}}{{$counts := index .Data "Counts"}}
+<div class="head-row">
+  <h1>Comments</h1>
+  <nav class="filter" aria-label="Show">
+    <a href="{{.Base}}comments"{{if eq $show "pending"}} aria-current="page"{{end}}>Waiting <span class="count">{{index $counts "pending"}}</span></a>
+    <a href="{{.Base}}comments?show=approved"{{if eq $show "approved"}} aria-current="page"{{end}}>Approved <span class="count">{{index $counts "approved"}}</span></a>
+    <a href="{{.Base}}comments?show=spam"{{if eq $show "spam"}} aria-current="page"{{end}}>Spam <span class="count">{{index $counts "spam"}}</span></a>
+  </nav>
+</div>
+{{with index .Data "Comments"}}<ol class="queue">{{range .}}<li class="queue-item">
+  <div class="queue-head">
+    <span><strong>{{.Author}}</strong>{{if .URL}} <a href="{{.URL}}" rel="nofollow noopener" target="_blank">{{.URL}}</a>{{end}}{{if .Email}} <span class="muted">{{.Email}}</span>{{end}}</span>
+    <span class="muted">on <em>{{index $titles .Post}}</em>{{if .ParentID}} (a reply){{end}}, {{ago .CreatedAt}}</span>
+  </div>
+  <div class="queue-body">{{.HTML | safe}}</div>
+  <div class="queue-actions">
+    {{if ne .Status "approved"}}<form method="post" action="{{$.Base}}comments/action" class="inline"><input type="hidden" name="csrf" value="{{$.CSRF}}"><input type="hidden" name="kind" value="comment"><input type="hidden" name="id" value="{{.ID}}"><input type="hidden" name="show" value="{{$show}}"><input type="hidden" name="action" value="approve"><button class="small primary" type="submit">Approve</button></form>{{end}}
+    {{if ne .Status "spam"}}<form method="post" action="{{$.Base}}comments/action" class="inline"><input type="hidden" name="csrf" value="{{$.CSRF}}"><input type="hidden" name="kind" value="comment"><input type="hidden" name="id" value="{{.ID}}"><input type="hidden" name="show" value="{{$show}}"><input type="hidden" name="action" value="spam"><button class="small secondary" type="submit">Spam</button></form>{{end}}
+    <form method="post" action="{{$.Base}}comments/action" class="inline"><input type="hidden" name="csrf" value="{{$.CSRF}}"><input type="hidden" name="kind" value="comment"><input type="hidden" name="id" value="{{.ID}}"><input type="hidden" name="show" value="{{$show}}"><input type="hidden" name="action" value="delete"><button class="small link danger" type="submit">Delete</button></form>
+    <details class="reply"><summary>Reply</summary>
+      <form method="post" action="{{$.Base}}comments/action" class="stack"><input type="hidden" name="csrf" value="{{$.CSRF}}"><input type="hidden" name="kind" value="comment"><input type="hidden" name="id" value="{{.ID}}"><input type="hidden" name="show" value="{{$show}}"><input type="hidden" name="action" value="reply">
+        <label class="visually-hidden" for="r{{.ID}}">Your reply</label><textarea id="r{{.ID}}" name="body" rows="3" required></textarea>
+        <button class="small primary" type="submit">Post reply{{if ne .Status "approved"}} and approve{{end}}</button></form>
+    </details>
+  </div>
+</li>{{end}}</ol>{{else}}<p class="empty">{{if eq $show "pending"}}Nothing waiting. New comments show up here before they appear on the site.{{else}}None.{{end}}</p>{{end}}
+
+<h2 class="section">Mentions from other sites</h2>
+{{with index .Data "Mentions"}}<ol class="queue">{{range .}}<li class="queue-item">
+  <div class="queue-head">
+    <span><strong>{{if .Author}}{{.Author}}{{else}}Someone{{end}}</strong> <span class="chip">{{.Type}}</span> <a href="{{.Source}}" rel="nofollow noopener" target="_blank">{{.Source}}</a></span>
+    <span class="muted">on <em>{{index $titles .Post}}</em>, {{ago .CreatedAt}}</span>
+  </div>
+  {{with .HTML}}<div class="queue-body">{{. | safe}}</div>{{end}}
+  <div class="queue-actions">
+    {{if ne .Status "approved"}}<form method="post" action="{{$.Base}}comments/action" class="inline"><input type="hidden" name="csrf" value="{{$.CSRF}}"><input type="hidden" name="kind" value="mention"><input type="hidden" name="id" value="{{.ID}}"><input type="hidden" name="show" value="{{$show}}"><input type="hidden" name="action" value="approve"><button class="small primary" type="submit">Approve</button></form>{{end}}
+    {{if ne .Status "spam"}}<form method="post" action="{{$.Base}}comments/action" class="inline"><input type="hidden" name="csrf" value="{{$.CSRF}}"><input type="hidden" name="kind" value="mention"><input type="hidden" name="id" value="{{.ID}}"><input type="hidden" name="show" value="{{$show}}"><input type="hidden" name="action" value="spam"><button class="small secondary" type="submit">Spam</button></form>{{end}}
+    <form method="post" action="{{$.Base}}comments/action" class="inline"><input type="hidden" name="csrf" value="{{$.CSRF}}"><input type="hidden" name="kind" value="mention"><input type="hidden" name="id" value="{{.ID}}"><input type="hidden" name="show" value="{{$show}}"><input type="hidden" name="action" value="delete"><button class="small link danger" type="submit">Delete</button></form>
+  </div>
+</li>{{end}}</ol>{{else}}<p class="empty">No mentions {{if eq $show "pending"}}waiting{{else}}here{{end}}.</p>{{end}}{{end}}

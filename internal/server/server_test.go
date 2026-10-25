@@ -61,7 +61,9 @@ func git(t *testing.T, dir string, args ...string) string {
 	return string(out)
 }
 
-func newHarness(t *testing.T) *harness {
+func newHarness(t *testing.T) *harness { return newHarnessWith(t, "[comments]\nenabled = false\n", nil) }
+
+func newHarnessWith(t *testing.T, extraConfig string, client *http.Client) *harness {
 	t.Helper()
 	if _, err := exec.LookPath("git"); err != nil {
 		t.Skip("git not installed")
@@ -72,7 +74,7 @@ func newHarness(t *testing.T) *harness {
 		os.MkdirAll(filepath.Dir(p), 0o755)
 		os.WriteFile(p, []byte(body), 0o644)
 	}
-	write("config.toml", "[site]\ntitle = \"Test\"\nurl = \"https://blog.example\"\ntimezone = \"UTC\"\n[author]\nname = \"Ada\"\n[comments]\nenabled = false\n[server]\ndata = \".data\"\n")
+	write("config.toml", "[site]\ntitle = \"Test\"\nurl = \"https://blog.example\"\ntimezone = \"UTC\"\n[author]\nname = \"Ada\"\nemail = \"ada@blog.example\"\n[server]\ndata = \".data\"\n"+extraConfig)
 	write(".gitignore", "/.data/\n/dist/\n/.skimdit/\n")
 	write("content/posts/existing/index.md", "---\ntitle: Existing post\ndate: 2026-01-01\n---\nAlready here.\n")
 	git(t, root, "init", "-q", "-b", "main")
@@ -80,10 +82,11 @@ func newHarness(t *testing.T) *harness {
 	git(t, root, "commit", "-q", "-m", "init")
 
 	c := &clock{t: time.Date(2026, 10, 25, 12, 0, 0, 0, time.UTC)}
-	srv, err := New(Options{Root: root, Secret: testSecret, Now: c.now, NoWorkers: true, Log: log.New(io.Discard, "", 0)})
+	srv, err := New(Options{Root: root, Secret: testSecret, Now: c.now, NoWorkers: true, Log: log.New(io.Discard, "", 0), HTTPClient: client})
 	if err != nil {
 		t.Fatal(err)
 	}
+	srv.testMailer = &recordingMailer{}
 	t.Cleanup(func() { srv.Close() })
 	hs := httptest.NewServer(srv.Handler())
 	t.Cleanup(hs.Close)

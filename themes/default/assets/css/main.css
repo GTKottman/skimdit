@@ -258,6 +258,13 @@ button:disabled { opacity: 0.6; cursor: progress; }
 .response-author { color: var(--text); font-weight: 600; }
 .response-body { font-size: var(--t-small); }
 .response-body > :last-child { margin-bottom: 0; }
+.response-list.nested { margin: var(--s-3) 0 0 var(--s-5); padding-left: var(--s-4); border-left: 2px solid var(--line); border-top: 0; }
+.response-list.nested .response:last-child { border-bottom: 0; }
+.reply-button { min-height: 2rem; margin-top: var(--s-2); padding: 0 var(--s-3); background: none; border: 1px solid var(--control-border); color: var(--muted); font-weight: 500; }
+.reply-button:hover { color: var(--text); background: none; }
+.reply-button[hidden] { display: none; }
+.responses-sub { font-size: var(--t-small); margin: var(--s-6) 0 var(--s-2); }
+.reaction-list { display: flex; flex-wrap: wrap; gap: var(--s-2) var(--s-5); list-style: none; padding: 0; margin: 0; font-size: var(--t-ui); }
 .facepile { display: flex; flex-wrap: wrap; gap: var(--s-1); list-style: none; padding: 0; }
 .facepile img { display: block; width: var(--s-6); height: var(--s-6); object-fit: cover; background: var(--surface); }
 .search-form { margin-bottom: var(--s-4); }

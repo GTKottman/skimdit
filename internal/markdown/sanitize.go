@@ -75,9 +75,10 @@ func CommentPolicy() *bluemonday.Policy {
 		p.AllowStandardURLs()
 		p.AllowURLSchemes("http", "https")
 		p.RequireParseableURLs(true)
-		p.AllowElements("p", "br", "em", "strong", "code", "pre", "blockquote", "ul", "ol", "li", "del")
+		p.AllowElements("p", "br", "em", "strong", "b", "i", "code", "pre", "blockquote", "ul", "ol", "li", "del")
 		p.AllowAttrs("href").OnElements("a")
 		p.RequireNoFollowOnLinks(true)
+		p.RequireNoReferrerOnLinks(true)
 		p.AddTargetBlankToFullyQualifiedLinks(false)
 		p.AllowRelativeURLs(false)
 		commentPol = p

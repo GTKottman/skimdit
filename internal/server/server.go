@@ -76,6 +76,9 @@ type Server struct {
 	mux         *http.ServeMux
 	admin       *adminUI
 	stats       *statsCounter
+	testMailer  Mailer
+	powUsed     map[string]time.Time
+	powMu       sync.Mutex
 }
 
 type redirect struct {
@@ -133,6 +136,7 @@ func New(opts Options) (*Server, error) {
 		apiLimit:    newLimiter(30, time.Minute),
 		postLimit:   newLimiter(5, 10*time.Minute),
 		waSessions:  map[string]*webauthn.SessionData{},
+		powUsed:     map[string]time.Time{},
 		jobHandlers: map[string]jobHandler{},
 	}
 	s.stats = newStatsCounter(s)

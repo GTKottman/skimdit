@@ -186,3 +186,9 @@ func FuzzRender(f *testing.F) {
 		}
 	})
 }
+
+func TestRenderComment(t *testing.T) {
+	out := RenderComment("Nice *post*! <script>x</script> ![img](https://evil/x.png) [link](https://ok.example) <b onclick=x>b</b>")
+	has(t, out, "<em>post</em>", `rel="nofollow`, `href="https://ok.example"`)
+	hasNot(t, out, "<script", "<img", "onclick")
+}
