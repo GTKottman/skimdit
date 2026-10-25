@@ -61,7 +61,9 @@ func git(t *testing.T, dir string, args ...string) string {
 	return string(out)
 }
 
-func newHarness(t *testing.T) *harness { return newHarnessWith(t, "[comments]\nenabled = false\n", nil) }
+func newHarness(t *testing.T) *harness {
+	return newHarnessWith(t, "[comments]\nenabled = false\n", nil)
+}
 
 func newHarnessWith(t *testing.T, extraConfig string, client *http.Client) *harness {
 	t.Helper()

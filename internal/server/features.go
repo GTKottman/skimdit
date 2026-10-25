@@ -72,7 +72,6 @@ func (s *Server) gitWebhook(w http.ResponseWriter, r *http.Request) {
 	httpError(w, http.StatusAccepted, "pulling and rebuilding")
 }
 
-
 func (s *Server) registerFeatureJobs() {
 	s.jobHandlers["comment_confirm"] = s.jobCommentConfirm
 	s.jobHandlers["comment_owner"] = s.jobCommentOwner
