@@ -92,10 +92,10 @@ type pageInfo struct {
 	ogImage string
 	jsonLD  []string
 	ids     map[string]bool
-	links []link
-	css   []string
-	js    []string
-	size  int
+	links   []link
+	css     []string
+	js      []string
+	size    int
 }
 
 type link struct {

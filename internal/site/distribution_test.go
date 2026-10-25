@@ -37,7 +37,9 @@ func TestFeedsAreValidAndAbsolute(t *testing.T) {
 		}
 	}
 	var rss struct {
-		Items []struct{ GUID string `xml:"guid"` } `xml:"channel>item"`
+		Items []struct {
+			GUID string `xml:"guid"`
+		} `xml:"channel>item"`
 	}
 	if err := xml.Unmarshal(files["rss.xml"], &rss); err != nil || len(rss.Items) != 3 {
 		t.Fatalf("rss: %v %d", err, len(rss.Items))

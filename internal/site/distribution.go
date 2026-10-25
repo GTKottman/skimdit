@@ -123,7 +123,7 @@ func (b *Build) feeds() error {
 	}
 	if cfg.Feeds.PerTag && cfg.Taxonomies.TagPages {
 		for _, t := range b.Site.Tags {
-			f := feedSet{title: cfg.Site.Title + ": " + t.Name, path: b.urlFile(t.URL+"feed.xml"), pageURL: t.URL, entries: limit(t.Entries)}
+			f := feedSet{title: cfg.Site.Title + ": " + t.Name, path: b.urlFile(t.URL + "feed.xml"), pageURL: t.URL, entries: limit(t.Entries)}
 			if err := b.atom(f); err != nil {
 				return err
 			}
@@ -133,7 +133,7 @@ func (b *Build) feeds() error {
 		for _, s := range b.Site.Series {
 			es := append([]*Entry(nil), s.Entries...)
 			sort.SliceStable(es, func(i, j int) bool { return es[i].Date.After(es[j].Date) })
-			f := feedSet{title: cfg.Site.Title + ": " + s.Name, path: b.urlFile(s.URL+"feed.xml"), pageURL: s.URL, entries: limit(es)}
+			f := feedSet{title: cfg.Site.Title + ": " + s.Name, path: b.urlFile(s.URL + "feed.xml"), pageURL: s.URL, entries: limit(es)}
 			if err := b.atom(f); err != nil {
 				return err
 			}
@@ -282,9 +282,9 @@ type rssItem struct {
 }
 
 type rssAtomLink struct {
-	Href    string   `xml:"href,attr"`
-	Rel     string   `xml:"rel,attr"`
-	Type    string   `xml:"type,attr"`
+	Href string `xml:"href,attr"`
+	Rel  string `xml:"rel,attr"`
+	Type string `xml:"type,attr"`
 }
 
 type rssChannel struct {
