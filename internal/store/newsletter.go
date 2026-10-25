@@ -180,7 +180,6 @@ func (s *Store) NextSends(post string, n int) ([]*PendingSend, error) {
 	return out, rows.Err()
 }
 
-
 // MarkSent records a delivered (or failed) email.
 func (s *Store) MarkSent(id int64, sendErr error) error {
 	if sendErr != nil {
