@@ -33,9 +33,9 @@ Nothing important lives only on the server: posts are in git, the database is on
 | `SKIMDIT_REPO` | `git@github.com:you/your-site.git` |
 | `SKIMDIT_DEPLOY_KEY` | the deploy key's private key (multi-line) |
 | `SKIMDIT_SECRET` | `openssl rand -base64 48` (keep it: changing it signs everyone out of their links) |
-| `LITESTREAM_REPLICA_URL` | `sftp://u123456@u123456.your-storagebox.de:23/skimdit/yourdomain` |
+| `LITESTREAM_REPLICA_URL` | `sftp://u123456-sub1@u123456.your-storagebox.de:23/home/yourdomain` (use a Storage Box sub-account limited to one folder; its files appear under `/home`) |
 | `LITESTREAM_SFTP_KEY` | private SSH key allowed on the Storage Box |
-| `LITESTREAM_SFTP_HOST_KEY` | the Storage Box's host key: `ssh-keyscan -p 23 -t ed25519 u123456.your-storagebox.de` (check it against Hetzner's published fingerprint) |
+| `LITESTREAM_SFTP_HOST_KEY` | the host key Litestream's SSH client is offered, which for a Hetzner Storage Box is the ECDSA one: `ssh-keyscan -p 23 -t ecdsa u123456.your-storagebox.de`, without the host name (check it against Hetzner's published fingerprint). The ed25519 key fails with `host key mismatch` |
 | `SKIMDIT_WEBHOOK_SECRET` | `openssl rand -hex 32` |
 | `SKIMDIT_SMTP_PASSWORD`, `SKIMDIT_IMAP_PASSWORD` | if the newsletter is on |
 
