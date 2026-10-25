@@ -1,0 +1,5 @@
+/skimdit
+/skimdit.exe
+/dist/
+*.test
+*.out

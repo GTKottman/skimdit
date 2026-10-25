@@ -1,0 +1,89 @@
+version: 2
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - main: ./cmd/skimdit
+    binary: skimdit
+    env:
+      - CGO_ENABLED=0
+    flags:
+      - -trimpath
+    ldflags:
+      - -s -w
+      - -X github.com/GTKottman/skimdit/internal/version.Version={{ .Version }}
+      - -X github.com/GTKottman/skimdit/internal/version.Commit={{ .ShortCommit }}
+      - -X github.com/GTKottman/skimdit/internal/version.Date={{ .CommitDate }}
+    mod_timestamp: "{{ .CommitTimestamp }}"
+    goos: [linux, darwin, windows]
+    goarch: [amd64, arm64]
+
+archives:
+  - formats: [tar.gz]
+    format_overrides:
+      - goos: windows
+        formats: [zip]
+    files:
+      - LICENSE
+      - README.md
+      - CHANGELOG.md
+
+checksum:
+  name_template: checksums.txt
+
+sboms:
+  - artifacts: archive
+
+signs:
+  - cmd: cosign
+    certificate: "${artifact}.pem"
+    signature: "${artifact}.sig"
+    args:
+      - sign-blob
+      - "--output-certificate=${certificate}"
+      - "--output-signature=${signature}"
+      - "${artifact}"
+      - --yes
+    artifacts: checksum
+
+dockers:
+  - image_templates:
+      - "ghcr.io/gtkottman/skimdit:{{ .Version }}-amd64"
+    use: buildx
+    goarch: amd64
+    build_flag_templates:
+      - --platform=linux/amd64
+      - --label=org.opencontainers.image.source=https://github.com/GTKottman/skimdit
+      - --label=org.opencontainers.image.licenses=AGPL-3.0-or-later
+  - image_templates:
+      - "ghcr.io/gtkottman/skimdit:{{ .Version }}-arm64"
+    use: buildx
+    goarch: arm64
+    build_flag_templates:
+      - --platform=linux/arm64
+      - --label=org.opencontainers.image.source=https://github.com/GTKottman/skimdit
+      - --label=org.opencontainers.image.licenses=AGPL-3.0-or-later
+
+docker_manifests:
+  - name_template: "ghcr.io/gtkottman/skimdit:{{ .Version }}"
+    image_templates:
+      - "ghcr.io/gtkottman/skimdit:{{ .Version }}-amd64"
+      - "ghcr.io/gtkottman/skimdit:{{ .Version }}-arm64"
+  - name_template: "ghcr.io/gtkottman/skimdit:latest"
+    image_templates:
+      - "ghcr.io/gtkottman/skimdit:{{ .Version }}-amd64"
+      - "ghcr.io/gtkottman/skimdit:{{ .Version }}-arm64"
+
+docker_signs:
+  - cmd: cosign
+    artifacts: manifests
+    args:
+      - sign
+      - "${artifact}"
+      - --yes
+
+changelog:
+  use: github
+  sort: asc
