@@ -263,9 +263,18 @@ func (s *Server) health(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, "no site built yet")
 		return
 	}
+	var failed int
+	_ = s.store.DB.QueryRow(`SELECT COUNT(*) FROM jobs WHERE failed_at IS NOT NULL AND failed_at > ?`, s.now().Add(-7*24*time.Hour).Unix()).Scan(&failed)
+	// ?strict=1 is for uptime monitors: anything that needs the owner fails it.
+	if r.URL.Query().Get("strict") == "1" && (errMsg != "" || failed > 0) {
+		w.WriteHeader(http.StatusServiceUnavailable)
+	}
 	fmt.Fprintf(w, "ok\nbuilt %s\n", at.UTC().Format(time.RFC3339))
 	if errMsg != "" {
 		fmt.Fprintf(w, "last build failed (serving the previous one): %s\n", firstLine(errMsg))
+	}
+	if failed > 0 {
+		fmt.Fprintf(w, "%d background job(s) failed this week: see Admin > Activity\n", failed)
 	}
 }
 

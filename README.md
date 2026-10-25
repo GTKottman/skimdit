@@ -6,7 +6,7 @@ Skimdit turns a folder of Markdown files into a fast, static, accessible site, a
 
 Its first site is [deeperthinking.xyz](https://deeperthinking.xyz).
 
-> **Status: early development (milestone M0).** Nothing is usable yet. Do not run a real site on it until 1.0.
+> **Status: feature-complete, being proven on deeperthinking.xyz before the first stable release.**
 
 ## Principles
 
@@ -43,14 +43,32 @@ Everything below ships in 1.0. Each milestone must pass its checks before the ne
 | M9 | Security review, fuzzing, load test, restore drill, full documentation |
 | M10 | 1.0 release |
 
-## Building from source
+## What it does
+
+- **Writing:** Markdown with footnotes, tables, math (rendered at build time), highlighted code, callouts and safe embeds; a web editor with live preview, autosave, versions, image uploads and scheduling; or plain files and `git push`.
+- **Reading:** a fast, accessible, dark-first theme (light mode included); search, tags, series, archives, related posts and backlinks; no cookies, no trackers, no JavaScript required.
+- **Reaching readers:** Atom, RSS and JSON feeds, sitemap, social cards, structured data; a double opt-in newsletter; webmentions; ActivityPub; Mastodon and Bluesky cross-posting.
+- **Hearing back:** moderated comments with spam defences that do not track anyone; replies by email; cookieless stats.
+- **Lasting:** old URLs never break (every move is redirected); deterministic builds; continuous database backups and a tested restore; import from WordPress, Ghost, Hugo and Jekyll; export to a zip that is a working site.
+- **Extending:** themes with a stable, versioned contract and per-file overrides; sandboxed WebAssembly plugins.
+
+## Quick start
 
 ```sh
-go build ./cmd/skimdit
-./skimdit version
+go install github.com/GTKottman/skimdit/cmd/skimdit@latest
+skimdit init my-blog && cd my-blog
+skimdit new "My first post"
+skimdit dev            # http://127.0.0.1:1414, reloads as you write
+skimdit check          # links, images, drafts, feeds, page weight
+skimdit build          # static site in dist/
+skimdit serve          # the full server: editor, comments, newsletter...
 ```
 
-Requires Go 1.27 or newer.
+Requires Go 1.27 or newer to build. Release binaries and a container image (`ghcr.io/gtkottman/skimdit`) come with each tagged release.
+
+## Documentation
+
+[Writing](docs/WRITING.md) · [CLI](docs/CLI.md) · [Configuration](docs/CONFIG.md) · [Themes](docs/THEMES.md) · [Feeds and SEO](docs/DISTRIBUTION.md) · [Server](docs/SERVER.md) · [Comments and webmentions](docs/REPLIES.md) · [Newsletter and stats](docs/NEWSLETTER.md) · [Fediverse](docs/FEDIVERSE.md) · [Plugins](docs/PLUGINS.md) · [Import and export](docs/IMPORT.md) · [Deploying](docs/DEPLOY.md)
 
 ## Contributing
 
