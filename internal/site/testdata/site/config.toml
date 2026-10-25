@@ -1,0 +1,14 @@
+[site]
+title = "Fixture Blog"
+url = "https://fixture.example"
+description = "A test site."
+timezone = "America/Chicago"
+intro = "Hello, *reader*."
+posts_per_page = 2
+
+[author]
+name = "Ada Writer"
+email = "ada@fixture.example"
+
+[comments]
+enabled = true

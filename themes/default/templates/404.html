@@ -1,0 +1,10 @@
+{{template "base" .}}
+{{define "main"}}<div class="wrap">
+  <h1 class="page-title">{{t "not_found_title"}}</h1>
+  <p>{{t "not_found_text"}}</p>
+  {{if .Site.Features.Search}}<form class="search-form" role="search" action="{{rel "/search/"}}" method="get">
+    <label for="nf-q" class="visually-hidden">{{t "search_placeholder"}}</label>
+    <div class="field-row"><input id="nf-q" name="q" type="search" placeholder="{{t "search_placeholder"}}"><button type="submit">{{t "search_button"}}</button></div>
+  </form>{{end}}
+  {{if .Recent}}<h2 class="section-title">{{t "recent_posts"}}</h2>{{template "partials/entry-list" .Recent}}{{end}}
+</div>{{end}}

@@ -1,0 +1,11 @@
+{{template "base" .}}
+{{define "main"}}<div class="wrap">
+  <h1 class="page-title">{{.Title}}</h1>
+  {{if .Archive.Day}}{{template "partials/entry-list" .List}}{{else}}
+  {{range .Archive.Years}}<section class="archive-year" aria-labelledby="y{{.Year}}">
+    <h2 id="y{{.Year}}" class="archive-year-title"><a href="{{.URL}}">{{.Year}}</a> <span class="term-count">{{postsCount (len .Entries)}}</span></h2>
+    {{range .Months}}<h3 class="archive-month-title"><a href="{{.URL}}">{{.Name}}</a></h3>
+    <ul class="entry-list compact">{{range .Entries}}<li class="entry-item"><a class="entry-item-title" href="{{.URL}}">{{.Title}}</a> <time class="entry-item-date" datetime="{{isoDate .Date}}">{{date .Date}}</time></li>{{end}}</ul>
+    {{end}}
+  </section>{{end}}{{end}}
+</div>{{end}}

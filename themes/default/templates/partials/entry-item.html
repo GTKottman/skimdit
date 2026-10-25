@@ -1,0 +1,5 @@
+<li class="entry-item h-entry">
+  <a class="entry-item-title u-url p-name" href="{{.URL}}">{{.Title}}</a>
+  <time class="entry-item-date dt-published" datetime="{{isoDate .Date}}">{{date .Date}}</time>
+  {{with .Excerpt}}<p class="entry-item-excerpt p-summary">{{.}}</p>{{end}}
+</li>

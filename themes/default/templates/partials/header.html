@@ -1,0 +1,14 @@
+<header class="site-header">
+  <div class="wrap header-row">
+    <a class="site-title" href="{{rel "/"}}"{{if eq .Kind "home"}} aria-current="page"{{end}}>{{.Site.Title}}</a>
+    <nav class="site-nav" aria-label="{{t "menu"}}">
+      <ul>
+        <li><a href="{{rel "/archive/"}}"{{if eq .Kind "archive"}} aria-current="page"{{end}}>{{t "archive"}}</a></li>
+        {{if .Site.Features.TagPages}}<li><a href="{{rel "/tags/"}}"{{if or (eq .Kind "tags") (eq .Kind "tag")}} aria-current="page"{{end}}>{{t "tags"}}</a></li>{{end}}
+        {{range .Site.Pages}}<li><a href="{{.URL}}"{{if $.Entry}}{{if eq $.Entry.URL .URL}} aria-current="page"{{end}}{{end}}>{{.Title}}</a></li>{{end}}
+        {{if .Site.Features.Search}}<li><a href="{{rel "/search/"}}"{{if eq .Kind "search"}} aria-current="page"{{end}}>{{t "search"}}</a></li>{{end}}
+      </ul>
+    </nav>
+    <button class="theme-toggle" type="button" hidden aria-label="{{t "theme_toggle"}}" title="{{t "theme_toggle"}}"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9z"/></svg></button>
+  </div>
+</header>

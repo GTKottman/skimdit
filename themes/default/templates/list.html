@@ -1,0 +1,10 @@
+{{template "base" .}}
+{{define "main"}}<div class="wrap">
+  <header class="list-header">
+    <h1 class="page-title">{{if .Term}}{{t "posts_tagged" "name" .Term.Name}}{{else if .Series}}{{.Series.Name}}{{else}}{{.Title}}{{end}}</h1>
+    {{if .Term}}<p class="list-count">{{postsCount .Term.Count}} · <a href="{{.Term.URL}}feed.xml">{{t "feed"}}</a></p>{{end}}
+    {{if .Series}}<p class="list-count">{{postsCount (len .Series.Entries)}} · <a href="{{.Series.URL}}feed.xml">{{t "feed"}}</a></p>{{end}}
+  </header>
+  {{if .Series}}<ol class="entry-list series-list">{{range .List}}{{template "partials/entry-item" .}}{{end}}</ol>{{else}}{{template "partials/entry-list" .List}}{{end}}
+  {{template "partials/pagination" .}}
+</div>{{end}}

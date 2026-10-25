@@ -1,0 +1,13 @@
+{{if .Site.Features.Newsletter}}<section class="newsletter" aria-labelledby="newsletter-title">
+  <h2 id="newsletter-title">{{t "newsletter_title"}}</h2>
+  <p>{{t "newsletter_text"}}</p>
+  <form class="newsletter-form" method="post" action="{{.Site.Features.API}}subscribe">
+    <label for="newsletter-email">{{t "newsletter_email"}}</label>
+    <div class="field-row">
+      <input id="newsletter-email" name="email" type="email" autocomplete="email" required maxlength="254">
+      <input type="hidden" name="source" value="{{.URL}}">
+      <div class="hp" aria-hidden="true"><label>Leave empty <input name="website" tabindex="-1" autocomplete="off"></label></div>
+      <button type="submit">{{t "newsletter_submit"}}</button>
+    </div>
+  </form>
+</section>{{end}}

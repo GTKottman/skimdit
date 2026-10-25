@@ -1,0 +1,5 @@
+{{template "base" .}}
+{{define "main"}}<div class="wrap">
+  <h1 class="page-title">{{t "series"}}</h1>
+  <ul class="term-rows">{{range .Site.Series}}<li><a href="{{.URL}}">{{.Name}}</a> <span class="term-count">{{postsCount (len .Entries)}}</span></li>{{end}}</ul>
+</div>{{end}}

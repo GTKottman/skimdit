@@ -1,0 +1,11 @@
+{{template "base" .}}
+{{define "main"}}<div class="wrap">
+  {{if and .Site.Intro (eq .Pagination.Page 1)}}<section class="intro h-card">
+    <h1 class="intro-title p-name">{{.Site.Title}}</h1>
+    <div class="intro-text p-note">{{.Site.Intro}}</div>
+  </section>{{else}}<h1 class="page-title">{{if eq .Pagination.Page 1}}{{t "latest_posts"}}{{else}}{{t "posts"}}{{end}}</h1>{{end}}
+  {{if and .Site.Intro (eq .Pagination.Page 1)}}<h2 class="section-title">{{t "latest_posts"}}</h2>{{end}}
+  {{template "partials/entry-list" .List}}
+  {{template "partials/pagination" .}}
+  {{if eq .Pagination.Page 1}}{{template "partials/newsletter" .}}{{end}}
+</div>{{end}}

@@ -1,0 +1,41 @@
+{{template "base" .}}
+{{define "main"}}{{with .Entry}}<article class="wrap entry h-entry">
+  {{if eq .Status "draft"}}<p class="banner" role="status">{{t "draft_banner"}}</p>{{else if $.NoIndex}}{{if .Unlisted}}<p class="banner" role="status">{{t "unlisted_banner"}}</p>{{else}}<p class="banner" role="status">{{t "scheduled_banner"}}</p>{{end}}{{end}}
+  <header class="entry-header">
+    {{with .Series}}<p class="entry-series"><a href="{{.URL}}">{{t "part_of_series" "n" $.Entry.SeriesPart "name" .Name}}</a></p>{{end}}
+    <h1 class="entry-title p-name">{{.Title}}</h1>
+    <p class="entry-meta">
+      <time class="dt-published" datetime="{{isoDate .Date}}">{{date .Date}}</time>
+      {{if not .Updated.IsZero}}<span class="sep" aria-hidden="true">·</span> <span>{{t "updated"}} <time class="dt-updated" datetime="{{isoDate .Updated}}">{{date .Updated}}</time></span>{{end}}
+      <span class="sep" aria-hidden="true">·</span> <span>{{t "reading_time" "n" .ReadingTime}}</span>
+      <a class="u-url" href="{{.Permalink}}" hidden>{{.Permalink}}</a>
+      <span class="p-author h-card" hidden><span class="p-name">{{$.Site.Author.Name}}</span><a class="u-url" href="{{$.Site.URL}}">{{$.Site.URL}}</a></span>
+    </p>
+    {{template "partials/tags" .Tags}}
+  </header>
+  {{with .Cover}}<figure class="entry-cover">{{.HTML}}</figure>{{end}}
+  {{if .ShowTOC}}{{template "partials/toc" .}}{{end}}
+  <div class="entry-content e-content">
+{{.Content}}
+  </div>
+  <footer class="entry-footer">
+    {{if or .SeriesPrev .SeriesNext}}<nav class="entry-nav" aria-label="{{.Series.Name}}">
+      {{with .SeriesPrev}}<a class="entry-nav-prev" href="{{.URL}}" rel="prev"><span>{{t "previous_in_series"}}</span>{{.Title}}</a>{{end}}
+      {{with .SeriesNext}}<a class="entry-nav-next" href="{{.URL}}" rel="next"><span>{{t "next_in_series"}}</span>{{.Title}}</a>{{end}}
+    </nav>{{end}}
+    {{if .Related}}<section class="related" aria-labelledby="related-title">
+      <h2 id="related-title">{{t "related_posts"}}</h2>
+      {{template "partials/entry-list" .Related}}
+    </section>{{end}}
+    {{if .Backlinks}}<section class="backlinks" aria-labelledby="backlinks-title">
+      <h2 id="backlinks-title">{{t "backlinks"}}</h2>
+      <ul class="link-list">{{range .Backlinks}}<li><a href="{{.URL}}">{{.Title}}</a></li>{{end}}</ul>
+    </section>{{end}}
+    {{if or .Prev .Next}}<nav class="entry-nav" aria-label="{{t "posts"}}">
+      {{with .Prev}}<a class="entry-nav-prev" href="{{.URL}}"><span>{{t "previous_post"}}</span>{{.Title}}</a>{{end}}
+      {{with .Next}}<a class="entry-nav-next" href="{{.URL}}"><span>{{t "next_post"}}</span>{{.Title}}</a>{{end}}
+    </nav>{{end}}
+  </footer>
+  {{template "partials/responses" $}}
+  {{template "partials/newsletter" $}}
+</article>{{end}}{{end}}

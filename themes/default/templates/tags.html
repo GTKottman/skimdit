@@ -1,0 +1,5 @@
+{{template "base" .}}
+{{define "main"}}<div class="wrap">
+  <h1 class="page-title">{{t "tags"}}</h1>
+  <ul class="term-list">{{range .Site.Tags}}<li><a class="chip" href="{{.URL}}" rel="tag">{{.Name}}</a> <span class="term-count">{{.Count}}</span></li>{{end}}</ul>
+</div>{{end}}

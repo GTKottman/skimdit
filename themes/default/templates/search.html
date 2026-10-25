@@ -1,0 +1,15 @@
+{{template "base" .}}
+{{define "main"}}<div class="wrap">
+  <h1 class="page-title">{{t "search"}}</h1>
+  <form class="search-form" role="search" action="{{rel "/search/"}}" method="get" data-index="{{rel "/search-index.json"}}">
+    <label for="search-q" class="visually-hidden">{{t "search_placeholder"}}</label>
+    <div class="field-row">
+      <input id="search-q" name="q" type="search" placeholder="{{t "search_placeholder"}}" autocomplete="off">
+      <button type="submit">{{t "search_button"}}</button>
+    </div>
+  </form>
+  <p class="search-status" role="status" aria-live="polite"></p>
+  <ul class="entry-list search-results"></ul>
+  <noscript><p>{{t "search_no_js"}} <a href="https://duckduckgo.com/?q=site%3A{{.Site.URL}}">DuckDuckGo</a></p></noscript>
+  <template id="search-strings" data-none="{{t "search_no_results" "name" "{q}"}}" data-count="{{t "search_results" "n" "{n}"}}"></template>
+</div>{{end}}

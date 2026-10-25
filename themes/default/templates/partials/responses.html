@@ -1,0 +1,22 @@
+{{/* Comments, webmentions and fediverse replies. Filled in by the server. */}}
+{{with .Entry}}{{if .Comments}}<section class="responses" id="responses" aria-labelledby="responses-title">
+  <h2 id="responses-title">{{t "comments"}}</h2>
+  {{if $.Site.Features.ReplyByEmail}}<p class="reply-email"><a href="{{mailto $.Site.Author.Email (print "Re: " .Title)}}">{{t "reply_by_email"}}</a></p>{{end}}
+  <form class="comment-form" method="post" action="{{$.Site.Features.API}}comments" data-pow>
+    <input type="hidden" name="post" value="{{.Slug}}">
+    <p class="form-note">{{t "comment_moderation"}}</p>
+    <label for="c-name">{{t "comment_name"}}</label>
+    <input id="c-name" name="name" required maxlength="80" autocomplete="name">
+    <label for="c-email">{{t "comment_email"}}</label>
+    <input id="c-email" name="email" type="email" maxlength="254" autocomplete="email">
+    <label for="c-url">{{t "comment_website"}}</label>
+    <input id="c-url" name="url" type="url" maxlength="300" autocomplete="url">
+    <label for="c-body">{{t "comment_body"}}</label>
+    <textarea id="c-body" name="body" required rows="6" maxlength="5000"></textarea>
+    <label class="check"><input type="checkbox" name="notify" value="1"> {{t "comment_reply_notify"}}</label>
+    <div class="hp" aria-hidden="true"><label>Leave empty <input name="website" tabindex="-1" autocomplete="off"></label></div>
+    <input type="hidden" name="pow" value="">
+    <noscript><p class="form-note">{{t "comment_needs_js"}}</p></noscript>
+    <button type="submit">{{t "comment_submit"}}</button>
+  </form>
+</section>{{end}}{{end}}

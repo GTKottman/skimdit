@@ -1,0 +1,6 @@
+<nav class="toc" aria-labelledby="toc-title">
+  <h2 id="toc-title" class="toc-title">{{t "on_this_page"}}</h2>
+  <ol>
+  {{range .TOC}}<li class="toc-level-{{.Level}}"><a href="#{{.ID}}">{{.Text}}</a></li>
+  {{end}}</ol>
+</nav>

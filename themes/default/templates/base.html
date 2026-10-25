@@ -1,0 +1,16 @@
+{{define "base"}}<!doctype html>
+<html lang="{{.Lang}}">
+<head>
+{{template "partials/head" .}}
+</head>
+<body class="kind-{{.Kind}}">
+<a class="skip-link" href="#main">{{t "skip_to_content"}}</a>
+{{template "partials/header" .}}
+<main id="main" tabindex="-1">
+{{block "main" .}}{{end}}
+</main>
+{{template "partials/footer" .}}
+{{if .Site.Dev}}<script src="/__skimdit/livereload.js"></script>{{end}}
+</body>
+</html>
+{{end}}

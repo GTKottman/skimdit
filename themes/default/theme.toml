@@ -1,0 +1,6 @@
+name = "default"
+version = "1.0.0"
+engine_api = 1
+description = "Skimdit's default theme: dark-first, text-first, fast and accessible."
+license = "AGPL-3.0-or-later"
+author = "Skimdit contributors"

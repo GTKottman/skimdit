@@ -1,0 +1,10 @@
+{{template "base" .}}
+{{define "main"}}{{with .Entry}}<article class="wrap entry">
+  {{if eq .Status "draft"}}<p class="banner" role="status">{{t "draft_banner"}}</p>{{end}}
+  <header class="entry-header"><h1 class="entry-title">{{.Title}}</h1></header>
+  {{with .Cover}}<figure class="entry-cover">{{.HTML}}</figure>{{end}}
+  {{if .ShowTOC}}{{template "partials/toc" .}}{{end}}
+  <div class="entry-content">
+{{.Content}}
+  </div>
+</article>{{end}}{{end}}

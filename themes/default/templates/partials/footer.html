@@ -1,0 +1,11 @@
+<footer class="site-footer">
+  <div class="wrap footer-row">
+    <p class="footer-copy">{{if .Site.Copyright}}{{.Site.Copyright}}{{else}}© {{if .Site.Year}}{{.Site.Year}} {{end}}{{.Site.Author.Name}}{{end}}</p>
+    <ul class="footer-links">
+      {{range $i, $f := .Site.Feeds}}{{if eq $i 0}}<li><a href="{{$f.URL}}" rel="alternate" type="{{$f.Type}}">{{t "feed"}}</a></li>{{end}}{{end}}
+      {{range .Site.Social}}<li><a href="{{.}}" rel="me">{{.}}</a></li>{{end}}
+      {{if .Site.Features.Fediverse}}<li>{{t "follow_fediverse" "name" .Site.Features.FediverseHandle}}</li>{{end}}
+      <li><a href="https://github.com/GTKottman/skimdit">{{t "powered_by" "name" "Skimdit"}}</a></li>
+    </ul>
+  </div>
+</footer>
