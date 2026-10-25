@@ -55,7 +55,11 @@ func Load(root string, specs []struct {
 }) (*Host, error) {
 	h := &Host{directives: map[string]*Plugin{}}
 	for _, sp := range specs {
-		p, err := load(filepath.Join(root, sp.Path), sp.Config)
+		path := sp.Path
+		if !filepath.IsAbs(path) {
+			path = filepath.Join(root, path)
+		}
+		p, err := load(path, sp.Config)
 		if err != nil {
 			h.Close()
 			return nil, fmt.Errorf("plugin %s: %w", sp.Path, err)
