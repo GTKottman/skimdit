@@ -1,5 +1,5 @@
 {{with .Pagination}}{{if gt .Pages 1}}<nav class="pagination" aria-label="{{t "page_n_of_m" "n" .Page "m" .Pages}}">
-  {{if .PrevURL}}<a class="pagination-prev" href="{{.PrevURL}}" rel="prev">← {{t "newer"}}</a>{{end}}
+  {{if .PrevURL}}<a class="pagination-prev" href="{{.PrevURL}}" rel="prev">{{t "newer"}}</a>{{end}}
   <span class="pagination-status">{{t "page_n_of_m" "n" .Page "m" .Pages}}</span>
-  {{if .NextURL}}<a class="pagination-next" href="{{.NextURL}}" rel="next">{{t "older"}} →</a>{{end}}
+  {{if .NextURL}}<a class="pagination-next" href="{{.NextURL}}" rel="next">{{t "older"}}</a>{{end}}
 </nav>{{end}}{{end}}

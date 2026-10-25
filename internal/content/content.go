@@ -72,6 +72,7 @@ type Item struct {
 	Description string
 	Cover       string
 	CoverAlt    string
+	SocialImage string
 	Aliases     []string
 	Canonical   string
 	Lang        string

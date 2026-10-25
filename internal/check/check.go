@@ -8,6 +8,8 @@ package check
 import (
 	"bytes"
 	"compress/gzip"
+	"encoding/json"
+	"encoding/xml"
 	"fmt"
 	"net/url"
 	"os"
@@ -38,7 +40,10 @@ func (r *Report) OK() bool { return !r.Diags.HasErrors() }
 var Extra []func(b *site.Build, out string, add func(content.Diagnostic))
 
 // Run checks the site at root.
-func Run(root string, now time.Time) (*Report, error) {
+func Run(root string, now time.Time) (*Report, error) { return RunWith(root, now, "") }
+
+// RunWith checks the site and keeps the built output in keep when it is set.
+func RunWith(root string, now time.Time, keep string) (*Report, error) {
 	cfg, err := config.Load(root)
 	if err != nil {
 		return nil, err
@@ -49,6 +54,9 @@ func Run(root string, now time.Time) (*Report, error) {
 	}
 	defer os.RemoveAll(tmp)
 	out := filepath.Join(tmp, "site")
+	if keep != "" {
+		out = keep
+	}
 	start := time.Now()
 	res, err := site.Run(site.Options{Root: root, Config: cfg, Out: out, Now: now})
 	rep := &Report{}
@@ -81,7 +89,9 @@ func Run(root string, now time.Time) (*Report, error) {
 }
 
 type pageInfo struct {
-	ids   map[string]bool
+	ogImage string
+	jsonLD  []string
+	ids     map[string]bool
 	links []link
 	css   []string
 	js    []string
@@ -160,6 +170,19 @@ func checkOutput(cfg *config.Config, out string, files []string, add func(conten
 				}
 			}
 		}
+		if pg.ogImage != "" {
+			if file, _, internal := resolve(f, pg.ogImage); internal && !exists[file] {
+				add(content.Diagnostic{File: f, Message: fmt.Sprintf("social image %s does not exist", pg.ogImage)})
+			}
+		}
+		for _, ld := range pg.jsonLD {
+			var v map[string]any
+			if err := json.Unmarshal([]byte(ld), &v); err != nil {
+				add(content.Diagnostic{File: f, Message: fmt.Sprintf("structured data (JSON-LD) is not valid JSON: %v", err)})
+			} else if v["@context"] != "https://schema.org" {
+				add(content.Diagnostic{File: f, Message: "structured data (JSON-LD) has no schema.org @context"})
+			}
+		}
 		// Weight budget: compressed HTML + CSS, and JS.
 		size := gzSize(filepath.Join(out, filepath.FromSlash(f)))
 		for _, c := range pg.css {
@@ -181,7 +204,39 @@ func checkOutput(cfg *config.Config, out string, files []string, add func(conten
 			add(content.Diagnostic{File: f, Message: fmt.Sprintf("page loads %.1f KB of compressed JavaScript, over the %d KB budget", float64(js)/1024, lim)})
 		}
 	}
+	checkSitemap(cfg, out, exists, add)
 	return len(pages)
+}
+
+// checkSitemap requires every sitemap URL to be a page that exists.
+func checkSitemap(cfg *config.Config, out string, exists map[string]bool, add func(content.Diagnostic)) {
+	b, err := os.ReadFile(filepath.Join(out, "sitemap.xml"))
+	if err != nil {
+		return
+	}
+	var doc struct {
+		URLs []struct {
+			Loc string `xml:"loc"`
+		} `xml:"url"`
+	}
+	if err := xml.Unmarshal(b, &doc); err != nil {
+		add(content.Diagnostic{File: "sitemap.xml", Message: "not valid XML: " + err.Error()})
+		return
+	}
+	prefix := cfg.AbsURL(cfg.Site.BasePath)
+	for _, u := range doc.URLs {
+		if !strings.HasPrefix(u.Loc, prefix) {
+			add(content.Diagnostic{File: "sitemap.xml", Message: u.Loc + " is not on this site"})
+			continue
+		}
+		file := strings.TrimPrefix(u.Loc, prefix)
+		if file == "" || strings.HasSuffix(file, "/") {
+			file += "index.html"
+		}
+		if !exists[file] {
+			add(content.Diagnostic{File: "sitemap.xml", Message: u.Loc + " is listed but does not exist"})
+		}
+	}
 }
 
 func gzSize(file string) int {
@@ -199,10 +254,19 @@ func gzSize(file string) int {
 func parsePage(b []byte) *pageInfo {
 	pg := &pageInfo{ids: map[string]bool{}, size: len(b)}
 	z := html.NewTokenizer(bytes.NewReader(b))
+	inLD := false
 	for {
 		tt := z.Next()
 		if tt == html.ErrorToken {
 			return pg
+		}
+		if tt == html.TextToken && inLD {
+			pg.jsonLD = append(pg.jsonLD, string(z.Text()))
+			continue
+		}
+		if tt == html.EndTagToken {
+			inLD = false
+			continue
 		}
 		if tt != html.StartTagToken && tt != html.SelfClosingTagToken {
 			continue
@@ -219,11 +283,18 @@ func parsePage(b []byte) *pageInfo {
 			}
 		}
 		switch tok.Data {
+		case "meta":
+			if attrs["property"] == "og:image" {
+				pg.ogImage = attrs["content"]
+			}
 		case "a":
 			if h, ok := attrs["href"]; ok && !strings.HasPrefix(h, "mailto:") {
 				pg.links = append(pg.links, link{"href", h})
 			}
 		case "img", "source", "video", "audio", "script":
+			if tok.Data == "script" && attrs["type"] == "application/ld+json" {
+				inLD = true
+			}
 			if s, ok := attrs["src"]; ok && s != "" {
 				pg.links = append(pg.links, link{"src", s})
 				if tok.Data == "script" {

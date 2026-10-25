@@ -161,7 +161,7 @@ func reorder(args []string) []string {
 		a := args[i]
 		if strings.HasPrefix(a, "-") && a != "-" {
 			flagsOut = append(flagsOut, a)
-			if !strings.Contains(a, "=") && i+1 < len(args) && (a == "--site" || a == "-site" || a == "--title" || a == "-title") {
+			if !strings.Contains(a, "=") && i+1 < len(args) && (a == "--site" || a == "-site" || a == "--title" || a == "-title" || a == "--out" || a == "-out") {
 				flagsOut = append(flagsOut, args[i+1])
 				i++
 			}
@@ -192,7 +192,7 @@ func cmdBuild(args []string, stdout, stderr io.Writer) error {
 	if err := fs.Parse(args); err != nil {
 		return err
 	}
-	res, err := site.Run(site.Options{Root: *siteDir, Out: *out, Drafts: *drafts, Now: now()})
+	res, err := site.Run(site.Options{Root: *siteDir, Out: *out, Drafts: *drafts, Now: now(), RecordURLs: !*drafts && *out == ""})
 	printDiags(stderr, res)
 	if err != nil {
 		if errors.Is(err, site.ErrBuild) {

@@ -22,11 +22,11 @@
     });
   }
 
-  // Copy buttons on code blocks.
+  // Copy buttons go in each code block's header band.
   if (navigator.clipboard) {
     doc.querySelectorAll("figure.code").forEach(function (fig) {
-      var pre = fig.querySelector("pre");
-      if (!pre) return;
+      var pre = fig.querySelector("pre"), head = fig.querySelector(".code-head");
+      if (!pre || !head) return;
       var b = doc.createElement("button");
       b.type = "button";
       b.className = "copy-code";
@@ -37,7 +37,7 @@
           setTimeout(function () { b.textContent = "Copy"; }, 1500);
         });
       });
-      fig.appendChild(b);
+      head.appendChild(b);
     });
   }
 
@@ -97,23 +97,6 @@
     });
   });
 
-  // Reading progress on posts.
-  var article = doc.querySelector(".kind-post .entry-content");
-  if (article && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-    var bar = doc.createElement("div");
-    bar.className = "progress";
-    bar.setAttribute("aria-hidden", "true");
-    doc.body.appendChild(bar);
-    var update = function () {
-      var r = article.getBoundingClientRect();
-      var total = r.height - window.innerHeight;
-      var p = total > 0 ? Math.min(1, Math.max(0, -r.top / total)) : 1;
-      bar.style.transform = "scaleX(" + p + ")";
-    };
-    window.addEventListener("scroll", update, { passive: true });
-    update();
-  }
-
   // Search (the index loads only when the search box is used).
   var form = doc.querySelector(".search-form[data-index]");
   if (form) {
@@ -124,7 +107,11 @@
     var index = null, loading = null;
     var load = function () {
       if (!loading) {
-        loading = fetch(form.getAttribute("data-index")).then(function (r) { return r.json(); }).then(function (j) { index = j; });
+        loading = fetch(form.getAttribute("data-index")).then(function (r) { return r.json(); }).then(function (m) {
+          return Promise.all(m.chunks.map(function (c) { return fetch(c).then(function (r) { return r.json(); }); }));
+        }).then(function (parts) {
+          index = { entries: [].concat.apply([], parts.map(function (p) { return p.entries; })) };
+        });
       }
       return loading;
     };
@@ -161,7 +148,7 @@
           li.append(a, time, p);
           list.appendChild(li);
         });
-        status.textContent = hits.length ? strings.dataset.count.replace("{n}", hits.length) : strings.dataset.none.replace("{q}", q);
+        status.textContent = hits.length === 1 ? strings.dataset.one : hits.length ? strings.dataset.count.replace("{n}", hits.length) : strings.dataset.none.replace("{q}", q);
       });
     };
     var timer;

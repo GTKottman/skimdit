@@ -61,9 +61,11 @@ func highlight(code, lang string, attrs map[string]string) (string, error) {
 	}
 	var out strings.Builder
 	out.WriteString("<figure class=\"code\" data-lang=\"" + html.EscapeString(label) + "\">")
+	out.WriteString("<figcaption class=\"code-head\"><span class=\"code-lang\">" + html.EscapeString(label) + "</span>")
 	if t := attrs["title"]; t != "" {
-		out.WriteString("<figcaption class=\"code-title\">" + html.EscapeString(t) + "</figcaption>")
+		out.WriteString("<span class=\"code-title\">" + html.EscapeString(t) + "</span>")
 	}
+	out.WriteString("</figcaption>")
 	out.WriteString(body)
 	out.WriteString("</figure>")
 	return out.String(), nil

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-stylesheet href="/feed.xsl" type="text/xsl"?>
+<rss version="2.0">
+  <channel>
+    <title>Fixture Blog</title>
+    <link>https://fixture.example/</link>
+    <description>A test site.</description>
+    <language>en</language>
+    <lastBuildDate>Tue, 20 Oct 2026 00:00:00 -0500</lastBuildDate>
+    <generator>Skimdit 0.0.0-dev</generator>
+    <link xmlns="http://www.w3.org/2005/Atom" href="https://fixture.example/rss.xml" rel="self" type="application/rss+xml"></link>
+    <item>
+      <title>Zeta in HTML</title>
+      <link>https://fixture.example/posts/zeta/</link>
+      <guid isPermaLink="false">tag:fixture.example,2026-10-20:zeta</guid>
+      <pubDate>Tue, 20 Oct 2026 00:00:00 -0500</pubDate>
+      <description>&lt;h2 id=&#34;part&#34;&gt;Part&lt;/h2&gt;&#xA;&lt;p&gt;Plain &lt;strong&gt;HTML&lt;/strong&gt; post.&lt;/p&gt;&#xA;&#xA;</description>
+    </item>
+    <item>
+      <title>Beta</title>
+      <link>https://fixture.example/posts/beta/</link>
+      <guid isPermaLink="false">tag:fixture.example,2026-10-10:beta</guid>
+      <pubDate>Sat, 10 Oct 2026 09:30:00 -0500</pubDate>
+      <description>&lt;p&gt;Beta continues. Back to &lt;a href=&#34;https://fixture.example/posts/alpha/#code&#34;&gt;alpha&lt;/a&gt;.&lt;/p&gt;&#xA;&#xA;&lt;p&gt;The rest of beta.&lt;/p&gt;&#xA;</description>
+      <category>Go</category>
+    </item>
+    <item>
+      <title>Alpha: the first post</title>
+      <link>https://fixture.example/posts/alpha/</link>
+      <guid isPermaLink="false">tag:fixture.example,2026-10-01:alpha</guid>
+      <pubDate>Thu, 01 Oct 2026 00:00:00 -0500</pubDate>
+      <description>&lt;p&gt;Alpha opens the series. See &lt;a href=&#34;https://fixture.example/posts/beta/&#34;&gt;beta&lt;/a&gt; and &lt;a href=&#34;https://fixture.example/posts/alpha/notes.pdf&#34;&gt;the PDF&lt;/a&gt;.&lt;sup id=&#34;fnref:1&#34;&gt;&lt;a href=&#34;#fn:1&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;1&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;&#xA;&lt;figure&gt;&lt;picture&gt;&lt;source type=&#34;image/avif&#34; srcset=&#34;https://fixture.example/media/243e1ae2f80792d0-64.avif 64w&#34; sizes=&#34;(max-width: 760px) 100vw, 760px&#34;&gt;&lt;source type=&#34;image/webp&#34; srcset=&#34;https://fixture.example/media/243e1ae2f80792d0-64.webp 64w&#34; sizes=&#34;(max-width: 760px) 100vw, 760px&#34;&gt;&lt;img src=&#34;https://fixture.example/media/243e1ae2f80792d0-64.png&#34; alt=&#34;A red square&#34; width=&#34;64&#34; height=&#34;48&#34; loading=&#34;lazy&#34; decoding=&#34;async&#34;&gt;&lt;/picture&gt;&lt;figcaption&gt;A red square&lt;/figcaption&gt;&lt;/figure&gt;&#xA;&lt;h2 id=&#34;code&#34;&gt;Code&lt;/h2&gt;&#xA;&lt;figure class=&#34;code&#34; data-lang=&#34;go&#34;&gt;&lt;figcaption class=&#34;code-head&#34;&gt;&lt;span class=&#34;code-lang&#34;&gt;go&lt;/span&gt;&lt;span class=&#34;code-title&#34;&gt;main.go&lt;/span&gt;&lt;/figcaption&gt;&lt;pre class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kn&#34;&gt;package&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;main&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line hl&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kd&#34;&gt;func&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;nf&#34;&gt;main&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;p&#34;&gt;{}&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;&#xA;&lt;h2 id=&#34;math&#34;&gt;Math&lt;/h2&gt;&#xA;&lt;p&gt;Inline &lt;span class=&#34;math math-inline&#34;&gt;&lt;span class=&#34;katex&#34;&gt;&lt;span class=&#34;katex-mathml&#34;&gt;&lt;math xmlns=&#34;http://www.w3.org/1998/Math/MathML&#34;&gt;&lt;semantics&gt;&lt;mrow&gt;&lt;msubsup&gt;&lt;mi&gt;a&lt;/mi&gt;&lt;mi&gt;b&lt;/mi&gt;&lt;mn&gt;2&lt;/mn&gt;&lt;/msubsup&gt;&lt;/mrow&gt;&lt;annotation encoding=&#34;application/x-tex&#34;&gt;a_b^2&lt;/annotation&gt;&lt;/semantics&gt;&lt;/math&gt;&lt;/span&gt;&lt;span class=&#34;katex-html&#34; aria-hidden=&#34;true&#34;&gt;&lt;span class=&#34;katex-base&#34;&gt;&lt;span class=&#34;katex-strut&#34; style=&#34;height:1.0972em;vertical-align:-0.2831em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;&lt;span class=&#34;mord mathnormal&#34;&gt;a&lt;/span&gt;&lt;span class=&#34;msupsub&#34;&gt;&lt;span class=&#34;vlist-t vlist-t2&#34;&gt;&lt;span class=&#34;vlist-r&#34;&gt;&lt;span class=&#34;vlist&#34; style=&#34;height:0.8141em;&#34;&gt;&lt;span style=&#34;top:-2.4169em;margin-left:0em;margin-right:0.05em;&#34;&gt;&lt;span class=&#34;pstrut&#34; style=&#34;height:2.7em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;katex-sizing reset-size6 size3 mtight&#34;&gt;&lt;span class=&#34;mord mathnormal mtight&#34;&gt;b&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;top:-3.063em;margin-right:0.05em;&#34;&gt;&lt;span class=&#34;pstrut&#34; style=&#34;height:2.7em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;katex-sizing reset-size6 size3 mtight&#34;&gt;&lt;span class=&#34;mord mtight&#34;&gt;2&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;vlist-s&#34;&gt;​&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;vlist-r&#34;&gt;&lt;span class=&#34;vlist&#34; style=&#34;height:0.2831em;&#34;&gt;&lt;span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt; and display:&lt;/p&gt;&#xA;&lt;div class=&#34;math math-display&#34;&gt;&lt;span class=&#34;katex-display&#34;&gt;&lt;span class=&#34;katex&#34;&gt;&lt;span class=&#34;katex-mathml&#34;&gt;&lt;math xmlns=&#34;http://www.w3.org/1998/Math/MathML&#34; display=&#34;block&#34;&gt;&lt;semantics&gt;&lt;mrow&gt;&lt;/mrow&gt;&lt;annotation encoding=&#34;application/x-tex&#34;&gt;&lt;/annotation&gt;&lt;/semantics&gt;&lt;/math&gt;&lt;/span&gt;&lt;span class=&#34;katex-html&#34; aria-hidden=&#34;true&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/div&gt;&#xA;&lt;h2 id=&#34;extras&#34;&gt;Extras&lt;/h2&gt;&lt;aside class=&#34;callout callout-note&#34; role=&#34;note&#34;&gt;&lt;p class=&#34;callout-title&#34;&gt;Note&lt;/p&gt;&lt;p&gt;A callout.&lt;/p&gt;&lt;/aside&gt;&#xA;&lt;figure class=&#34;embed embed-video&#34;&gt;&lt;a class=&#34;embed-facade&#34; href=&#34;https://www.youtube.com/watch?v=dQw4w9WgXcQ&#34; data-embed=&#34;youtube&#34; data-id=&#34;dQw4w9WgXcQ&#34; data-start=&#34;&#34;&gt;&lt;span class=&#34;embed-play&#34; aria-hidden=&#34;true&#34;&gt;▶&lt;/span&gt;&lt;span class=&#34;embed-title&#34;&gt;A video&lt;/span&gt;&lt;span class=&#34;embed-note&#34;&gt;Plays from YouTube when clicked&lt;/span&gt;&lt;/a&gt;&lt;/figure&gt;&#xA;&lt;p class=&#34;site-note&#34;&gt;site directive&lt;/p&gt;&#xA;&#xA;&lt;section class=&#34;footnotes&#34; role=&#34;doc-endnotes&#34;&gt;&#xA;&lt;ol&gt;&#xA;&lt;li id=&#34;fn:1&#34;&gt;&#xA;&lt;p&gt;A footnote. &lt;a href=&#34;#fnref:1&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;↩︎&lt;/a&gt;&lt;/p&gt;&#xA;&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;/section&gt;&#xA;</description>
+      <category>Go</category>
+      <category>Web</category>
+    </item>
+  </channel>
+</rss>

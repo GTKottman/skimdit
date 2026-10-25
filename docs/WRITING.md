@@ -32,6 +32,7 @@ excerpt: Shown in lists.      # default: the text before <!--more-->, or the fir
 description: For search engines and social previews. # default: the excerpt
 cover: cover.jpg
 cover_alt: What the cover shows   # required with cover
+social_image: card.png        # replaces the generated sharing image
 aliases: [/old/url/]          # old addresses that redirect here
 canonical: https://elsewhere.example/original  # if first published elsewhere
 lang: en

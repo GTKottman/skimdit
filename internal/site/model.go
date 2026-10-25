@@ -106,9 +106,10 @@ type Entry struct {
 	Extra       map[string]any
 	Source      string
 
-	item  *content.Item
-	links []string
-	doc   *markdown.Doc
+	item        *content.Item
+	links       []string
+	doc         *markdown.Doc
+	socialImage string
 }
 
 // ImageData is a processed image for templates.

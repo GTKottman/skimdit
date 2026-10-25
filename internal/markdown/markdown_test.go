@@ -78,7 +78,7 @@ func TestMathError(t *testing.T) {
 
 func TestCode(t *testing.T) {
 	d := render(t, "```go {title=\"main.go\" hl=\"2\"}\npackage main\nfunc main() {}\n```\n\n```\nplain <b>\n```\n", Hooks{})
-	has(t, d.HTML, `<figure class="code" data-lang="go">`, `<figcaption class="code-title">main.go</figcaption>`, `class="chroma"`, "&lt;b&gt;", `class="line hl"`)
+	has(t, d.HTML, `<figure class="code" data-lang="go">`, `<span class="code-title">main.go</span>`, `class="chroma"`, "&lt;b&gt;", `class="line hl"`)
 	if !d.HasCode {
 		t.Error("HasCode false")
 	}

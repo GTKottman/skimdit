@@ -48,6 +48,8 @@ type Options struct {
 	Now time.Time
 	// Workers limits parallel rendering. Zero means the number of CPUs.
 	Workers int
+	// RecordURLs updates published-urls.txt and redirects.toml (production builds).
+	RecordURLs bool
 	// Extra hooks run after pages are rendered and before the output is swapped in.
 	Extra []func(*Build) error
 }
@@ -207,7 +209,13 @@ func (b *Build) run() (*Result, error) {
 	steps := []func() error{
 		b.writeAssets,
 		b.writeStatic,
+		b.socialCards,
 		b.renderPages,
+		b.feeds,
+		b.sitemap,
+		b.robots,
+		b.searchIndexIfOn,
+		b.redirectsFile,
 		b.writeCopies,
 		b.writeMedia,
 	}

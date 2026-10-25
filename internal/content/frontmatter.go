@@ -13,7 +13,7 @@ import (
 // Fields lists every frontmatter key, for validation and docs.
 var Fields = []string{
 	"title", "slug", "date", "updated", "status", "tags", "series", "series_order",
-	"excerpt", "description", "cover", "cover_alt", "aliases", "canonical", "lang",
+	"excerpt", "description", "cover", "cover_alt", "social_image", "aliases", "canonical", "lang",
 	"toc", "comments", "schema_version", "extra",
 }
 
@@ -109,6 +109,8 @@ func decodeFrontmatter(src []byte, it *Item, file string, loc *time.Location) Di
 			it.Cover = scalar(v, key, errAt)
 		case "cover_alt":
 			it.CoverAlt = scalar(v, key, errAt)
+		case "social_image":
+			it.SocialImage = scalar(v, key, errAt)
 		case "aliases":
 			it.Aliases = list(v, key, errAt)
 			for _, a := range it.Aliases {

@@ -29,6 +29,24 @@ jobs:
       - run: go test -race ./...
       - run: go build ./cmd/skimdit
 
+  theme:
+    # Builds the theme-contract sample site and runs axe accessibility checks on every page type.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: go run ./cmd/skimdit theme check --out "$RUNNER_TEMP/sample"
+      - name: axe (WCAG 2.2 AA)
+        run: |
+          python3 -m http.server 8137 --directory "$RUNNER_TEMP/sample" >/dev/null 2>&1 &
+          sleep 1
+          npx --yes pa11y-ci@3.1.0 --config .github/pa11y.json
+
   vulncheck:
     runs-on: ubuntu-latest
     steps:

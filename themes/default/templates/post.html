@@ -6,8 +6,8 @@
     <h1 class="entry-title p-name">{{.Title}}</h1>
     <p class="entry-meta">
       <time class="dt-published" datetime="{{isoDate .Date}}">{{date .Date}}</time>
-      {{if not .Updated.IsZero}}<span class="sep" aria-hidden="true">·</span> <span>{{t "updated"}} <time class="dt-updated" datetime="{{isoDate .Updated}}">{{date .Updated}}</time></span>{{end}}
-      <span class="sep" aria-hidden="true">·</span> <span>{{t "reading_time" "n" .ReadingTime}}</span>
+      {{if not .Updated.IsZero}}<span>{{t "updated"}} <time class="dt-updated" datetime="{{isoDate .Updated}}">{{date .Updated}}</time></span>{{end}}
+      <span class="reading-time">{{t "reading_time" "n" .ReadingTime}}</span>
       <a class="u-url" href="{{.Permalink}}" hidden>{{.Permalink}}</a>
       <span class="p-author h-card" hidden><span class="p-name">{{$.Site.Author.Name}}</span><a class="u-url" href="{{$.Site.URL}}">{{$.Site.URL}}</a></span>
     </p>

@@ -96,6 +96,7 @@ func (b *Build) page(kind, title, url string) *Page {
 		Recent:      firstN(b.Posts, 5),
 	}
 	p.Canonical = p.Permalink
+	p.NoIndex = b.staging()
 	if cfg.Social.Image != "" {
 		p.Image = cfg.AbsURL(cfg.Rel("/" + strings.TrimPrefix(cfg.Social.Image, "/")))
 	}
@@ -155,8 +156,11 @@ func (b *Build) renderPages() error {
 			p.Canonical = e.Canonical
 		}
 		p.NoIndex = e.Unlisted || e.Status == "draft" || (e.Kind == "post" && e.Date.After(b.Now))
-		if e.Cover != nil {
-			p.Image = e.Cover.AbsURL
+		if img := b.socialImage(e); img != "" {
+			p.Image = img
+		}
+		if b.staging() {
+			p.NoIndex = true
 		}
 		tmpl := "post"
 		if e.Kind == "page" {
@@ -274,9 +278,6 @@ func (b *Build) paginate(tmpl, title, base string, list []*Entry, set func(*Page
 		}
 		p.Pagination = pg
 		set(p)
-		if n > 1 {
-			p.Title = title + " · " + b.Locale.T("page_n_of_m", "n", n, "m", pages)
-		}
 		if err := b.emit(tmpl, p); err != nil {
 			return err
 		}
