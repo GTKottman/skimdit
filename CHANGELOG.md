@@ -4,6 +4,8 @@ All notable changes to Skimdit are documented here. The format follows [Keep a C
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-10-25
+
 ### Added
 
 - Repository setup: AGPL-3.0 licence, contribution guide, code of conduct, security policy.
