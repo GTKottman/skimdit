@@ -153,10 +153,10 @@ func (p *mathBlockParser) Open(parent ast.Node, reader text.Reader, pc parser.Co
 		start := seg.Start + bytes.Index(line, inner)
 		n.Lines().Append(text.NewSegment(start, start+len(inner)))
 		n.oneLine = true
-		reader.Advance(seg.Len())
+		reader.AdvanceToEOL()
 		return n, parser.NoChildren
 	}
-	reader.Advance(seg.Len())
+	reader.AdvanceToEOL()
 	return n, parser.NoChildren
 }
 
@@ -169,11 +169,11 @@ func (p *mathBlockParser) Continue(node ast.Node, reader text.Reader, pc parser.
 		return parser.Close
 	}
 	if string(bytes.TrimSpace(line)) == "$$" {
-		reader.Advance(seg.Len())
+		reader.AdvanceToEOL()
 		return parser.Close
 	}
 	node.Lines().Append(seg)
-	reader.Advance(seg.Len())
+	reader.AdvanceToEOL()
 	return parser.Continue | parser.NoChildren
 }
 
@@ -238,7 +238,7 @@ func (p *directiveParser) Open(parent ast.Node, reader text.Reader, pc parser.Co
 	if err != nil {
 		n.attrs = map[string]string{"__error": err.Error()}
 	}
-	reader.Advance(seg.Len())
+	reader.AdvanceToEOL()
 	if n.leaf {
 		return n, parser.NoChildren
 	}
@@ -250,12 +250,12 @@ func (p *directiveParser) Continue(node ast.Node, reader text.Reader, pc parser.
 	if n.leaf {
 		return parser.Close
 	}
-	line, seg := reader.PeekLine()
+	line, _ := reader.PeekLine()
 	if line == nil {
 		return parser.Close
 	}
 	if t := string(bytes.TrimSpace(line)); t == strings.Repeat(":", n.colons) {
-		reader.Advance(seg.Len())
+		reader.AdvanceToEOL()
 		n.closed = true
 		return parser.Close
 	}

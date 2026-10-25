@@ -1,0 +1,31 @@
+{{define "layout"}}<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>{{.Title}} · {{.Site}} admin</title>
+<link rel="stylesheet" href="{{.Assets}}admin.css">
+<script src="{{.Assets}}admin.js" defer></script>
+</head>
+<body{{if .CSRF}} data-csrf="{{.CSRF}}"{{end}} data-base="{{.Base}}">
+{{if .LoggedIn}}<header class="bar">
+  <a class="bar-site" href="{{.Base}}">{{.Site}}</a>
+  <nav aria-label="Admin">
+    <a href="{{.Base}}"{{if eq .Nav "posts"}} aria-current="page"{{end}}>Posts</a>
+    <a href="{{.Base}}comments"{{if eq .Nav "comments"}} aria-current="page"{{end}}>Comments</a>
+    <a href="{{.Base}}subscribers"{{if eq .Nav "subscribers"}} aria-current="page"{{end}}>Subscribers</a>
+    <a href="{{.Base}}stats"{{if eq .Nav "stats"}} aria-current="page"{{end}}>Stats</a>
+    <a href="{{.Base}}activity"{{if eq .Nav "activity"}} aria-current="page"{{end}}>Activity</a>
+    <a href="{{.Base}}settings"{{if eq .Nav "settings"}} aria-current="page"{{end}}>Settings</a>
+  </nav>
+  <a class="bar-view" href="{{.SiteURL}}" target="_blank" rel="noopener">View site</a>
+  <form method="post" action="{{.Base}}logout"><input type="hidden" name="csrf" value="{{.CSRF}}"><button class="link" type="submit">Sign out</button></form>
+</header>{{end}}
+<main class="{{if .LoggedIn}}page{{else}}narrow{{end}}">
+{{with .Flash}}<p class="flash" role="status">{{.}}</p>{{end}}
+{{with .Error}}<p class="error" role="alert">{{.}}</p>{{end}}
+{{template "content" .}}
+</main>
+</body>
+</html>{{end}}

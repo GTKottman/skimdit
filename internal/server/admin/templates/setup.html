@@ -1,0 +1,10 @@
+{{define "content"}}<h1>Create your account</h1>
+<p class="muted">This is the only account on this site. Choose a long password; you can add a passkey and a code app next.</p>
+<form method="post" class="stack">
+  <input type="hidden" name="token" value="{{index .Data "Token"}}">
+  <label for="pw">Password (at least 12 characters)</label>
+  <input id="pw" name="password" type="password" autocomplete="new-password" minlength="12" required>
+  <label for="pw2">Password again</label>
+  <input id="pw2" name="confirm" type="password" autocomplete="new-password" minlength="12" required>
+  <button class="primary" type="submit">Create account</button>
+</form>{{end}}

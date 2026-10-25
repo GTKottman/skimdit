@@ -91,6 +91,7 @@ Patterns with `:slug`, `:year`, `:month`, `:day`, ending in `/` (pretty URLs) or
 | `push` | `false` | Push publish commits to the git remote |
 | `branch` | `"main"` | Branch for publish commits |
 | `trust_proxy` | `false` | Read the client IP from `X-Forwarded-For` (behind Coolify/Traefik) |
+| `redirect_host` | `true` | Send requests for any other host name (`www.`, an IP) to the site's host; local addresses are exempt |
 
 Environment: `SKIMDIT_SECRET` (session and token signing key, at least 32 characters).
 

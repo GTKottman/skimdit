@@ -46,6 +46,7 @@ func contentPolicy() *bluemonday.Policy {
 		p.AllowAttrs("id").Matching(idRe).Globally()
 		p.AllowAttrs("role").Matching(regexp.MustCompile(`^doc-[a-z]+$|^note$`)).Globally()
 		p.AllowAttrs("aria-hidden").Matching(regexp.MustCompile(`^true$`)).OnElements("a", "span")
+		p.AllowAttrs("aria-label").Matching(regexp.MustCompile(`^[\p{L}\p{N} .,:;'()-]{1,100}$`)).OnElements("section", "nav", "aside", "figure")
 		p.AllowAttrs("tabindex").Matching(regexp.MustCompile(`^-1$`)).OnElements("a")
 		p.AllowAttrs("align").Matching(regexp.MustCompile(`^(left|right|center)$`)).OnElements("th", "td")
 		p.AllowAttrs("colspan", "rowspan").Matching(bluemonday.Integer).OnElements("th", "td")

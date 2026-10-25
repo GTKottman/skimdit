@@ -105,6 +105,8 @@ type Entry struct {
 	Comments    bool
 	Extra       map[string]any
 	Source      string
+	// Responses are approved comments, webmentions and fediverse replies.
+	Responses []*Response
 
 	item        *content.Item
 	links       []string
@@ -210,4 +212,52 @@ type Page struct {
 	Assets  string
 	SiteCSS string
 	NeedsJS bool
+}
+
+// Response is a comment, a webmention or a fediverse reply on a post.
+type Response struct {
+	ID int64
+	// Kind is comment, reply, like, repost or mention.
+	Kind        string
+	Author      string
+	AuthorURL   string
+	AuthorPhoto string
+	URL         string // the response's own page (webmentions, fediverse)
+	HTML        template.HTML
+	Date        time.Time
+	// Children are replies to this comment.
+	Children []*Response
+}
+
+// Comments returns only the threaded comments and replies.
+func (e *Entry) CommentList() []*Response {
+	var out []*Response
+	for _, r := range e.Responses {
+		if r.Kind == "comment" || r.Kind == "reply" {
+			out = append(out, r)
+		}
+	}
+	return out
+}
+
+// Reactions returns likes and reposts.
+func (e *Entry) Reactions() []*Response {
+	var out []*Response
+	for _, r := range e.Responses {
+		if r.Kind == "like" || r.Kind == "repost" {
+			out = append(out, r)
+		}
+	}
+	return out
+}
+
+// Mentions returns plain mentions from other sites.
+func (e *Entry) Mentions() []*Response {
+	var out []*Response
+	for _, r := range e.Responses {
+		if r.Kind == "mention" {
+			out = append(out, r)
+		}
+	}
+	return out
 }

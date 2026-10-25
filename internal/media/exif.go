@@ -105,3 +105,8 @@ func orient(src image.Image, o int) image.Image {
 	}
 	return dst
 }
+
+// Orient applies the EXIF orientation found in a JPEG's bytes to img.
+func Orient(img image.Image, jpegData []byte) image.Image {
+	return orient(img, jpegOrientation(jpegData))
+}

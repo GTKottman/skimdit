@@ -211,7 +211,7 @@ figure.code pre, .entry-content pre { margin: 0; padding: var(--s-4); overflow-x
 .embed { margin-inline: 0; }
 .embed-facade { display: grid; place-content: center; justify-items: center; gap: var(--s-2); aspect-ratio: 16 / 9; padding: var(--s-5); background: var(--surface); border: 1px solid var(--line); color: var(--text); text-align: center; text-decoration: none; }
 .embed-facade:hover { border-color: var(--line-strong); text-decoration: none; }
-.embed-play { display: grid; place-items: center; width: var(--s-8); height: var(--s-8); border: 1px solid var(--line-strong); font-size: 1.25rem; padding-left: 0.2em; }
+.embed-play { display: grid; place-items: center; width: var(--s-8); height: var(--s-8); border: 1px solid var(--line-strong); color: var(--link); font-size: 1.25rem; padding-left: 0.2em; }
 .embed-title { font-weight: 600; }
 .embed-note { color: var(--muted); font-size: var(--t-ui); }
 .embed iframe, .embed video { display: block; width: 100%; aspect-ratio: 16 / 9; border: 0; background: #000; }

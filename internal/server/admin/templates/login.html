@@ -1,0 +1,12 @@
+{{define "content"}}<h1>Sign in</h1>
+{{if index .Data "Passkeys"}}<button class="primary wide" type="button" data-passkey-login data-next="{{index .Data "Next"}}">Sign in with a passkey</button>
+<p class="passkey-status muted" role="status"></p>
+<p class="or">or with your password</p>{{end}}
+<form method="post" class="stack">
+  <input type="hidden" name="next" value="{{index .Data "Next"}}">
+  <label for="pw">Password</label>
+  <input id="pw" name="password" type="password" autocomplete="current-password" required>
+  {{if index .Data "TOTP"}}<label for="code">6-digit code from your app</label>
+  <input id="code" name="code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9 ]{6,7}" required>{{end}}
+  <button class="{{if index .Data "Passkeys"}}secondary{{else}}primary{{end}}" type="submit">Sign in</button>
+</form>{{end}}

@@ -1,0 +1,51 @@
+{{define "content"}}{{with index .Data "BuildError"}}<section class="alert" role="alert">
+  <h2>The last build failed</h2>
+  <p>Readers still see the previous version of the site.</p>
+  <pre>{{.}}</pre>
+</section>{{end}}
+<div class="head-row">
+  <h1>Posts</h1>
+  <form method="post" action="{{.Base}}new" class="inline">
+    <input type="hidden" name="csrf" value="{{.CSRF}}">
+    <input type="hidden" name="kind" value="post">
+    <button class="primary" type="submit">New post</button>
+  </form>
+  <form method="post" action="{{.Base}}new" class="inline">
+    <input type="hidden" name="csrf" value="{{.CSRF}}">
+    <input type="hidden" name="kind" value="page">
+    <button class="secondary" type="submit">New page</button>
+  </form>
+</div>
+{{with index .Data "Pending"}}<p class="pending">{{range $k, $v := .}}{{if $v}}<a href="{{$.Base}}{{$k}}">{{$v}} {{$k}} waiting</a>{{end}}{{end}}</p>{{end}}
+
+<h2 class="section">Drafts</h2>
+{{with index .Data "Drafts"}}<table class="rows">
+  <thead><tr><th>Title</th><th>State</th><th class="num">Edited</th></tr></thead>
+  <tbody>{{range .}}<tr>
+    <td><a href="{{$.Base}}drafts/{{.ID}}">{{.Title}}</a>{{if eq .Kind "page"}} <span class="chip">page</span>{{end}}</td>
+    <td>{{if .PublishAt}}<span class="state scheduled">Scheduled {{when .PublishAt}}</span>{{else if .Editing}}<span class="state">Editing a published {{.Kind}}</span>{{else}}<span class="state">Draft</span>{{end}}</td>
+    <td class="num">{{ago .UpdatedAt}}</td>
+  </tr>{{end}}</tbody>
+</table>{{else}}<p class="empty">No drafts. Start one with New post.</p>{{end}}
+
+<div class="head-row spaced">
+  <h2 class="section">Published</h2>
+  <form method="get" class="inline search" role="search">
+    <label class="visually-hidden" for="q">Find a post</label>
+    <input id="q" name="q" type="search" value="{{index .Data "Query"}}" placeholder="Find a post">
+  </form>
+</div>
+{{with index .Data "Posts"}}<table class="rows">
+  <thead><tr><th>Title</th><th>State</th><th class="num">Date</th><th class="actions"><span class="visually-hidden">Actions</span></th></tr></thead>
+  <tbody>{{range .}}<tr>
+    <td><a href="{{.URL}}" target="_blank" rel="noopener">{{.Title}}</a>{{if eq .Kind "page"}} <span class="chip">page</span>{{end}}</td>
+    <td><span class="state">{{.Status}}</span></td>
+    <td class="num">{{if eq .Kind "post"}}{{date .Date}}{{end}}</td>
+    <td class="actions">{{if .DraftID}}<a class="button small" href="{{$.Base}}drafts/{{.DraftID}}">Continue editing</a>{{else}}<form method="post" action="{{$.Base}}edit" class="inline"><input type="hidden" name="csrf" value="{{$.CSRF}}"><input type="hidden" name="source" value="{{.Source}}"><button class="small secondary" type="submit">Edit</button></form>{{end}}</td>
+  </tr>{{end}}</tbody>
+</table>{{else}}<p class="empty">{{if index .Data "Query"}}No published post matches.{{else}}Nothing published yet.{{end}}</p>{{end}}
+
+<footer class="meta-foot">
+  <span>Site built {{index .Data "BuiltAgo"}}{{with index .Data "Head"}}, git {{.}}{{end}}{{if not (index .Data "Git")}}, not a git repository: changes are not saved to git{{end}}</span>
+  <form method="post" action="{{.Base}}rebuild" class="inline"><input type="hidden" name="csrf" value="{{.CSRF}}"><button class="link" type="submit">Rebuild now</button></form>
+</footer>{{end}}

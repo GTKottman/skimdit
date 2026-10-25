@@ -50,8 +50,18 @@ type Options struct {
 	Workers int
 	// RecordURLs updates published-urls.txt and redirects.toml (production builds).
 	RecordURLs bool
+	// Hooks connect the build to the server (comments, mentions).
+	Hooks Hooks
 	// Extra hooks run after pages are rendered and before the output is swapped in.
 	Extra []func(*Build) error
+}
+
+// Hooks let the server add dynamic data to a build.
+type Hooks struct {
+	// Responses returns the approved comments and mentions of a post.
+	Responses func(e *Entry) []*Response
+	// Done runs after a successful build, before the output is swapped in.
+	Done func(b *Build) error
 }
 
 // Build is the state of one build. Later stages (feeds, sitemap, social
@@ -69,6 +79,8 @@ type Build struct {
 	Diags    content.Diagnostics
 	Out      string
 	Now      time.Time
+	// NextChange is when the next scheduled post becomes public (zero if none).
+	NextChange time.Time
 
 	md          *markdown.Renderer
 	media       *media.Pipeline
@@ -186,6 +198,13 @@ func (b *Build) run() (*Result, error) {
 	b.prepareEntries(items)
 	b.renderBodies()
 	b.relate()
+	if b.Opts.Hooks.Responses != nil {
+		for _, e := range b.Entries {
+			if e.Kind == "post" {
+				e.Responses = b.Opts.Hooks.Responses(e)
+			}
+		}
+	}
 	b.buildSiteData()
 	if b.Diags.HasErrors() {
 		return &Result{Diags: b.sortedDiags(), Build: b}, ErrBuild
@@ -226,6 +245,11 @@ func (b *Build) run() (*Result, error) {
 	}
 	for _, extra := range b.Opts.Extra {
 		if err := extra(b); err != nil {
+			return nil, err
+		}
+	}
+	if b.Opts.Hooks.Done != nil {
+		if err := b.Opts.Hooks.Done(b); err != nil {
 			return nil, err
 		}
 	}
@@ -294,6 +318,11 @@ func (b *Build) prepareEntries(items []*content.Item) {
 	cfg := b.Config
 	for _, it := range items {
 		if !b.visible(it) {
+			if it.Kind == content.KindPost && it.Status != content.StatusDraft && it.Date.After(b.Now) {
+				if b.NextChange.IsZero() || it.Date.Before(b.NextChange) {
+					b.NextChange = it.Date
+				}
+			}
 			continue
 		}
 		e := &Entry{

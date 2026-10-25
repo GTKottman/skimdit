@@ -1,0 +1,3 @@
+{{define "content"}}<h1>{{.Title}}</h1>
+<p>{{index .Data "Text"}}</p>
+{{with index .Data "Back"}}<p><a class="button" href="{{.}}">Back to the draft</a></p>{{end}}{{end}}

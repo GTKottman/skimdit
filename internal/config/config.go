@@ -163,6 +163,8 @@ type Server struct {
 	Branch string `toml:"branch"`
 	// TrustProxy makes the server read the client IP from X-Forwarded-For.
 	TrustProxy bool `toml:"trust_proxy"`
+	// RedirectHost sends requests for any other host name (www, an IP) to the site's host.
+	RedirectHost bool `toml:"redirect_host"`
 }
 
 type Comments struct {
@@ -276,9 +278,10 @@ func Default() Config {
 		Social:     Social{Cards: true},
 		Search:     Search{Enabled: true},
 		Server: Server{
-			Listen: ":8080",
-			Data:   ".skimdit/data",
-			Branch: "main",
+			Listen:       ":8080",
+			Data:         ".skimdit/data",
+			Branch:       "main",
+			RedirectHost: true,
 		},
 		Comments: Comments{
 			Enabled:      true,

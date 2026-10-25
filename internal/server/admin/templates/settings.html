@@ -1,0 +1,59 @@
+{{define "content"}}<h1>Settings</h1>
+
+<section class="card-less">
+  <h2 class="section">Passkeys</h2>
+  <p class="muted">A passkey signs you in with your fingerprint, face or device PIN. It cannot be phished.</p>
+  {{with index .Data "Passkeys"}}<table class="rows">
+    <thead><tr><th>Name</th><th class="num">Last used</th><th class="actions"><span class="visually-hidden">Actions</span></th></tr></thead>
+    <tbody>{{range .}}<tr><td>{{.Name}}</td><td class="num">{{ago .LastUsed}}</td>
+      <td class="actions"><form method="post" action="{{$.Base}}settings/passkeys/delete" class="inline"><input type="hidden" name="csrf" value="{{$.CSRF}}"><input type="hidden" name="id" value="{{printf "%x" .ID}}"><button class="small link danger" type="submit">Remove</button></form></td></tr>{{end}}</tbody>
+  </table>{{else}}<p class="empty">No passkeys yet.</p>{{end}}
+  <div class="field-row">
+    <label class="visually-hidden" for="pkname">Name for the new passkey</label>
+    <input id="pkname" placeholder="Name, e.g. Laptop" maxlength="60">
+    <button class="primary" type="button" data-passkey-add>Add a passkey</button>
+  </div>
+  <p class="passkey-status muted" role="status"></p>
+</section>
+
+<section>
+  <h2 class="section">Code app (two-step sign-in)</h2>
+  {{if index .Data "TOTP"}}<p>On. Signing in with a password also needs a 6-digit code.</p>
+  <form method="post" action="{{.Base}}settings/totp/disable" class="stack narrow-form">
+    <input type="hidden" name="csrf" value="{{.CSRF}}">
+    <label for="cur1">Current password</label><input id="cur1" name="current" type="password" autocomplete="current-password" required>
+    <label for="code1">Current code</label><input id="code1" name="code" inputmode="numeric" autocomplete="one-time-code" required>
+    <button class="secondary" type="submit">Turn off</button>
+  </form>
+  {{else}}{{with index .Data "NewTOTP"}}<p>Scan this with your code app (1Password, Aegis, Google Authenticator), then type the code it shows.</p>
+  <img class="qr" src="{{.QR}}" alt="QR code for the code app" width="220" height="220">
+  <p class="muted">Can't scan? Enter this key: <code>{{.Secret}}</code></p>
+  <form method="post" action="{{$.Base}}settings/totp/enable" class="stack narrow-form">
+    <input type="hidden" name="csrf" value="{{$.CSRF}}"><input type="hidden" name="signed" value="{{.Signed}}">
+    <label for="code2">Code from the app</label><input id="code2" name="code" inputmode="numeric" autocomplete="one-time-code" required>
+    <button class="primary" type="submit">Turn on</button>
+  </form>
+  {{else}}<p>Off. Turn it on so a stolen password alone cannot sign in.</p>
+  <a class="button secondary" href="{{.Base}}settings?totp=new">Set up a code app</a>{{end}}{{end}}
+</section>
+
+<section>
+  <h2 class="section">Password</h2>
+  <form method="post" action="{{.Base}}settings/password" class="stack narrow-form">
+    <input type="hidden" name="csrf" value="{{.CSRF}}">
+    <label for="cur2">Current password</label><input id="cur2" name="current" type="password" autocomplete="current-password" required>
+    {{if index .Data "TOTP"}}<label for="code3">Current code</label><input id="code3" name="code" inputmode="numeric" autocomplete="one-time-code" required>{{end}}
+    <label for="new1">New password (at least 12 characters)</label><input id="new1" name="password" type="password" autocomplete="new-password" minlength="12" required>
+    <label for="new2">New password again</label><input id="new2" name="confirm" type="password" autocomplete="new-password" minlength="12" required>
+    <button class="secondary" type="submit">Change password</button>
+  </form>
+</section>
+
+<section>
+  <h2 class="section">Signed-in browsers</h2>
+  <table class="rows">
+    <thead><tr><th>Browser</th><th>Address</th><th class="num">Signed in</th></tr></thead>
+    <tbody>{{range index .Data "Sessions"}}<tr><td>{{.UserAgent}}</td><td>{{.IP}}</td><td class="num">{{ago .CreatedAt}}</td></tr>{{end}}</tbody>
+  </table>
+  <form method="post" action="{{.Base}}settings/sessions/revoke" class="inline"><input type="hidden" name="csrf" value="{{.CSRF}}"><button class="secondary" type="submit">Sign out everywhere else</button></form>
+</section>{{end}}

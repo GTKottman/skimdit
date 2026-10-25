@@ -193,7 +193,7 @@ func TestFeatures(t *testing.T) {
 	for _, want := range []string{
 		`href="/posts/beta/"`, `href="/posts/alpha/notes.pdf"`, "<picture>", `type="image/avif"`,
 		`class="math math-display"`, `<figure class="code" data-lang="go">`, `callout-note`,
-		`data-embed="youtube"`, `<p class="site-note">site directive</p>`, `Part 1 of Intro`, `role="doc-endnotes"`,
+		`data-embed="youtube"`, `<p class="site-note">site directive</p>`, `Part 1 of Intro`, `class="footnotes"`,
 	} {
 		if !strings.Contains(alpha, want) {
 			t.Errorf("alpha missing %q", want)

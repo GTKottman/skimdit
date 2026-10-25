@@ -1,0 +1,11 @@
+{{define "content"}}<h1>Activity</h1>
+<p class="muted">Background work: scheduled publishing, newsletters, webmentions, fediverse delivery. Failed work is retried with growing pauses.</p>
+{{with index .Data "Jobs"}}<table class="rows">
+  <thead><tr><th>What</th><th>Result</th><th class="num">When</th><th class="actions"><span class="visually-hidden">Actions</span></th></tr></thead>
+  <tbody>{{range .}}<tr>
+    <td>{{.Kind}} <span class="muted">{{.Key}}</span></td>
+    <td>{{if .DoneAt}}<span class="state ok">Done</span> {{.Result}}{{else if .FailedAt}}<span class="state bad">Failed</span> {{.LastError}}{{else if .LastError}}<span class="state">Retrying</span> {{.LastError}}{{else}}<span class="state">Waiting</span>{{end}}</td>
+    <td class="num">{{ago .CreatedAt}}</td>
+    <td class="actions">{{if .FailedAt}}<form method="post" class="inline"><input type="hidden" name="csrf" value="{{$.CSRF}}"><input type="hidden" name="retry" value="{{.ID}}"><button class="small secondary" type="submit">Try again</button></form>{{end}}</td>
+  </tr>{{end}}</tbody>
+</table>{{else}}<p class="empty">Nothing has happened yet.</p>{{end}}{{end}}

@@ -542,7 +542,7 @@ func (nr *nodeRenderer) heading(w util.BufWriter, src []byte, node ast.Node, ent
 
 func (nr *nodeRenderer) footnoteList(w util.BufWriter, src []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
 	if entering {
-		_, _ = w.WriteString("<section class=\"footnotes\" role=\"doc-endnotes\">\n<ol>\n")
+		_, _ = w.WriteString("<section class=\"footnotes\" aria-label=\"Footnotes\">\n<ol>\n")
 	} else {
 		_, _ = w.WriteString("</ol>\n</section>\n")
 	}

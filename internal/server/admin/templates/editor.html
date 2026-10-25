@@ -1,0 +1,91 @@
+{{define "content"}}{{$d := index .Data "Draft"}}{{$f := index .Data "Fields"}}
+<form id="editor" class="editor" method="post" action="{{.Base}}drafts/{{$d.ID}}/save" data-draft="{{$d.ID}}" data-preview="{{.Base}}drafts/{{$d.ID}}/preview" data-upload="{{.Base}}drafts/{{$d.ID}}/upload" data-revisions="{{.Base}}drafts/{{$d.ID}}/revisions">
+  <input type="hidden" name="csrf" value="{{.CSRF}}">
+  <div class="editor-head">
+    <a class="back" href="{{.Base}}">Posts</a>
+    <span class="save-state" role="status" aria-live="polite">{{if index .Data "Editing"}}Editing {{index .Data "Editing"}}{{else}}Draft{{end}}</span>
+    <div class="tabs" role="tablist" aria-label="View">
+      <button type="button" role="tab" aria-selected="true" data-tab="write">Write</button>
+      <button type="button" role="tab" aria-selected="false" data-tab="preview">Preview</button>
+    </div>
+  </div>
+  <div class="editor-cols">
+    <section class="write" data-pane="write">
+      <label class="visually-hidden" for="title">Title</label>
+      <input id="title" class="title-input" name="title" value="{{$f.Title}}" placeholder="Title" required autocomplete="off">
+      <label class="visually-hidden" for="body">Text (Markdown)</label>
+      <textarea id="body" class="body-input" name="body" spellcheck="true" placeholder="Write in Markdown. Drop images here to upload them.">{{$d.Body}}</textarea>
+      <ul class="problems" aria-live="polite"></ul>
+      <div class="files">
+        <label class="button small secondary file-button">Upload a file<input type="file" name="file" data-upload-input accept=".jpg,.jpeg,.png,.gif,.webp,.svg,.pdf" hidden></label>
+        <span class="upload-state" role="status"></span>
+        <ul class="file-list">{{range index .Data "Files"}}<li><code>{{.}}</code> <button type="button" class="link" data-insert="{{.}}">Insert</button></li>{{end}}</ul>
+      </div>
+      <details class="details">
+        <summary>Details: URL, date, tags, series, sharing</summary>
+        <div class="grid">
+          <div><label for="slug">URL slug</label><input id="slug" name="slug" value="{{$f.Slug}}" pattern="[a-z0-9]+(-[a-z0-9]+)*" {{if index .Data "Editing"}}readonly title="Published slugs never change; add an alias instead"{{end}}></div>
+          {{if not (index .Data "IsPage")}}<div><label for="date">Date ({{index .Data "Timezone"}})</label><input id="date" name="date" value="{{$f.Date}}" placeholder="2026-10-25T09:00:00"></div>
+          <div><label for="updated">Updated</label><input id="updated" name="updated" value="{{$f.Updated}}" placeholder="only after real changes"></div>
+          <div><label for="tags">Tags (comma separated)</label><input id="tags" name="tags" value="{{index .Data "Tags"}}"></div>
+          <div><label for="series">Series</label><input id="series" name="series" value="{{$f.Series}}"></div>
+          <div><label for="series_order">Part number</label><input id="series_order" name="series_order" type="number" min="0" value="{{if $f.SeriesOrder}}{{$f.SeriesOrder}}{{end}}"></div>{{end}}
+          <div class="span"><label for="excerpt">Excerpt (lists and feeds)</label><input id="excerpt" name="excerpt" value="{{$f.Excerpt}}"></div>
+          <div class="span"><label for="description">Description (search engines, sharing)</label><input id="description" name="description" value="{{$f.Description}}" maxlength="300"></div>
+          <div><label for="cover">Cover image file</label><input id="cover" name="cover" value="{{$f.Cover}}"></div>
+          <div><label for="cover_alt">Cover description</label><input id="cover_alt" name="cover_alt" value="{{$f.CoverAlt}}"></div>
+          <div><label for="social_image">Sharing image file</label><input id="social_image" name="social_image" value="{{$f.SocialImage}}" placeholder="generated if empty"></div>
+          <div><label for="canonical">Canonical URL</label><input id="canonical" name="canonical" value="{{$f.Canonical}}" placeholder="only if first published elsewhere"></div>
+          <div class="span"><label for="aliases">Old addresses that should lead here (one per line)</label><textarea id="aliases" name="aliases" rows="2">{{index .Data "Aliases"}}</textarea></div>
+          <div><label class="check"><input type="checkbox" name="unlisted" value="1"{{if eq $f.Status "unlisted"}} checked{{end}}> Unlisted (only people with the link)</label></div>
+          {{if not (index .Data "IsPage")}}<div><label class="check"><input type="checkbox" name="comments" value="off"{{if $f.Comments}}{{if not (deref $f.Comments)}} checked{{end}}{{end}}> No comments on this post</label></div>{{end}}
+        </div>
+      </details>
+    </section>
+    <section class="preview" data-pane="preview" hidden>
+      <iframe title="Preview" src="{{.Base}}drafts/{{$d.ID}}/preview" sandbox="allow-same-origin allow-popups"></iframe>
+    </section>
+  </div>
+</form>
+<div class="publish-bar">
+  <form method="post" action="{{.Base}}drafts/{{$d.ID}}/publish" class="inline" data-flush>
+    <input type="hidden" name="csrf" value="{{.CSRF}}">
+    <button class="primary" type="submit">{{if index .Data "Editing"}}Publish changes{{else}}Publish now{{end}}</button>
+  </form>
+  {{if not (index .Data "Editing")}}<form method="post" action="{{.Base}}drafts/{{$d.ID}}/schedule" class="inline schedule" data-flush>
+    <input type="hidden" name="csrf" value="{{.CSRF}}">
+    <label for="publish_at">Schedule</label>
+    <input id="publish_at" name="publish_at" type="datetime-local" value="{{index .Data "Scheduled"}}">
+    <button class="secondary" type="submit">{{if index .Data "Scheduled"}}Change time{{else}}Schedule{{end}}</button>
+  </form>{{end}}
+  <button class="link" type="button" data-open="revisions">Versions</button>
+  {{if index .Data "Editing"}}<button class="link danger" type="button" data-open="unpublish">Unpublish</button>{{end}}
+  <button class="link danger" type="button" data-open="delete">{{if index .Data "Editing"}}Discard changes{{else}}Delete draft{{end}}</button>
+</div>
+
+<dialog id="revisions" class="dialog">
+  <h2>Versions</h2>
+  <p class="muted">A version is kept at most once a minute while you write.</p>
+  <ol class="revision-list"></ol>
+  <form method="post" action="{{.Base}}drafts/{{$d.ID}}/restore" class="revision-form" hidden><input type="hidden" name="csrf" value="{{.CSRF}}"><input type="hidden" name="revision"></form>
+  <div class="dialog-actions"><button class="secondary" type="button" data-close>Close</button></div>
+</dialog>
+<dialog id="delete" class="dialog">
+  <h2>{{if index .Data "Editing"}}Discard your changes?{{else}}Delete this draft?{{end}}</h2>
+  <p>{{if index .Data "Editing"}}The published post stays as it is. Your unpublished changes are lost.{{else}}The draft, its versions and its uploaded files are deleted for good.{{end}}</p>
+  <form method="post" action="{{.Base}}drafts/{{$d.ID}}/delete" class="dialog-actions">
+    <input type="hidden" name="csrf" value="{{.CSRF}}">
+    <button class="secondary" type="button" data-close>Keep it</button>
+    <button class="danger-button" type="submit">{{if index .Data "Editing"}}Discard{{else}}Delete{{end}}</button>
+  </form>
+</dialog>
+{{if index .Data "Editing"}}<dialog id="unpublish" class="dialog">
+  <h2>Unpublish this?</h2>
+  <p>It leaves the site and its address answers “gone”. The text comes back as a draft, so you can publish it again later.</p>
+  <form method="post" action="{{.Base}}unpublish" class="dialog-actions">
+    <input type="hidden" name="csrf" value="{{.CSRF}}">
+    <input type="hidden" name="source" value="{{index .Data "Editing"}}">
+    <button class="secondary" type="button" data-close>Keep it published</button>
+    <button class="danger-button" type="submit">Unpublish</button>
+  </form>
+</dialog>{{end}}{{end}}

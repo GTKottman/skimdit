@@ -64,7 +64,8 @@ func TestMath(t *testing.T) {
 	if !d.HasMath {
 		t.Fatal("HasMath false")
 	}
-	has(t, d.HTML, `class="math math-inline"`, `class="math math-display"`, "<math", "$5 and $10")
+	has(t, d.HTML, `class="math math-inline"`, `class="math math-display"`, "<math", "$5 and $10",
+		`<annotation encoding="application/x-tex">\frac{1}{2}`, `<annotation encoding="application/x-tex">x^2`)
 	// Underscores inside math must not become emphasis.
 	hasNot(t, d.HTML, "<em>b", "skmd")
 }
@@ -82,6 +83,11 @@ func TestCode(t *testing.T) {
 	if !d.HasCode {
 		t.Error("HasCode false")
 	}
+}
+
+func TestBlocksKeepFollowingLines(t *testing.T) {
+	d := render(t, "Para.\n\n$$\nE = mc^2\n$$\nAfter math.\n\n::youtube{id=dQw4w9WgXcQ title=\"V\"}\nAfter embed.\n", Hooks{})
+	has(t, d.HTML, "E = mc^2", "After math.", "After embed.")
 }
 
 func TestDirectives(t *testing.T) {
@@ -144,7 +150,7 @@ func TestLinkHook(t *testing.T) {
 
 func TestFootnotes(t *testing.T) {
 	d := render(t, "Claim.[^1]\n\n[^1]: Source.\n", Hooks{})
-	has(t, d.HTML, `role="doc-noteref"`, `<section class="footnotes" role="doc-endnotes">`, `id="fn:1"`)
+	has(t, d.HTML, `role="doc-noteref"`, `<section class="footnotes" aria-label="Footnotes">`, `id="fn:1"`)
 }
 
 func TestTypographerExcerpt(t *testing.T) {
