@@ -317,6 +317,7 @@ func (s *Server) Unpublish(source string) (*store.Draft, error) {
 		return nil, fmt.Errorf("%w:\n%s", errBuildFailed, err)
 	}
 	fields, _ := s.draftFields(d)
+	s.announceDelete(slugFromSource(source))
 	if _, err := s.git.Commit([]string{s.git.rel(removed), s.git.rel(redirectsPath), s.git.rel(filepath.Join(s.root, site.LedgerFile))}, "Unpublish: "+fields.Title); err != nil && !errors.Is(err, ErrNotRepo) {
 		return d, fmt.Errorf("unpublished, but saving to git failed: %w", err)
 	}

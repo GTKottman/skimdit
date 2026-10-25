@@ -18,6 +18,7 @@
   <div class="entry-content e-content">
 {{.Content}}
   </div>
+  {{with .Syndication}}<p class="syndication">{{t "also_on"}} {{range $i, $l := .}}{{if $i}}, {{end}}<a class="u-syndication" href="{{$l.URL}}" rel="syndication">{{$l.Name}}</a>{{end}}</p>{{end}}
   <footer class="entry-footer">
     {{if or .SeriesPrev .SeriesNext}}<nav class="entry-nav" aria-label="{{.Series.Name}}">
       {{with .SeriesPrev}}<a class="entry-nav-prev" href="{{.URL}}" rel="prev"><span>{{t "previous_in_series"}}</span>{{.Title}}</a>{{end}}

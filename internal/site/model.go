@@ -107,6 +107,8 @@ type Entry struct {
 	Source      string
 	// Responses are approved comments, webmentions and fediverse replies.
 	Responses []*Response
+	// Syndication lists copies of the post elsewhere (Mastodon, Bluesky).
+	Syndication []Link
 
 	item        *content.Item
 	links       []string
@@ -260,4 +262,10 @@ func (e *Entry) Mentions() []*Response {
 		}
 	}
 	return out
+}
+
+// Link is a named URL.
+type Link struct {
+	Name string
+	URL  string
 }

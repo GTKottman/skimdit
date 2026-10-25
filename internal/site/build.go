@@ -60,6 +60,8 @@ type Options struct {
 type Hooks struct {
 	// Responses returns the approved comments and mentions of a post.
 	Responses func(e *Entry) []*Response
+	// Syndication returns where a post was cross-posted.
+	Syndication func(e *Entry) []Link
 	// Done runs after a successful build, before the output is swapped in.
 	Done func(b *Build) error
 }
@@ -202,6 +204,9 @@ func (b *Build) run() (*Result, error) {
 		for _, e := range b.Entries {
 			if e.Kind == "post" {
 				e.Responses = b.Opts.Hooks.Responses(e)
+				if b.Opts.Hooks.Syndication != nil {
+					e.Syndication = b.Opts.Hooks.Syndication(e)
+				}
 			}
 		}
 	}

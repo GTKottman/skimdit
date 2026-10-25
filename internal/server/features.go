@@ -96,7 +96,7 @@ func (s *Server) announceChannels() []string {
 }
 
 func (s *Server) buildHooks() site.Hooks {
-	return site.Hooks{Responses: s.responses}
+	return site.Hooks{Responses: s.responses, Syndication: s.syndication}
 }
 
 // featureRoutes serves the admin pages added by later milestones.

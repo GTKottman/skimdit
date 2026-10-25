@@ -226,6 +226,8 @@ sup { position: relative; line-height: 0; }
 .lightbox::backdrop { background: rgb(5 8 14 / 0.94); }
 .lightbox img { display: block; max-width: 96vw; max-height: 96vh; cursor: zoom-out; }
 
+.syndication { margin: var(--s-6) 0 0; color: var(--muted); font: 400 var(--t-ui)/1.5 var(--sans); }
+
 /* After the post: navigation, related posts, backlinks, replies, newsletter. */
 .entry-footer { margin-top: var(--s-8); }
 .entry-footer h2, .responses h2, .newsletter h2 { font-size: var(--t-h3); margin: var(--s-7) 0 var(--s-3); }
